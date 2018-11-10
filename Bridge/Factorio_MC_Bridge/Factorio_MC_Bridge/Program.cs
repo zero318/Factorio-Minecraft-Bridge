@@ -103,28 +103,7 @@ namespace Factorio_MC_Bridge
 			*/
 			Console.WriteLine("Found settings. Beginning transfer.");
 			var rcon = new RCON(IPAddress.Parse(settings.getFactorioIPAddress()), (ushort)settings.getFactorioPort(), settings.getFactorioRconPass() );
-            var rcon2 = new RCON(IPAddress.Parse(settings.getMcIPAddress()), (ushort)settings.getMcPort(), settings.getMcRconPass());
-            if (settings.getMcType() == 1)
-            {
-                while (true)
-                {
-                    try
-                    {
-                        List<ItemPair> factorioItems = parseFactrio(settings, itemMappings, factorioRatios);
-                        List<ItemPair> minecraftItems = parseVanillaMinecraft(settings, itemMappings, minecraftRatios, rcon2).Result;
-                        sendToFactorio(minecraftItems, rcon);
-                        sendToVanillaMinecraft(factorioItems, settings, rcon2);
-                        Thread.Sleep(1000);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.InnerException);
-                        Console.WriteLine("Something went wrong. Moving past error.");
-                        Console.WriteLine(e.Message);
-                        continue;
-                    }
-                }
-            } else
+            if (settings.getMcType() == 0)
             {
                 while (true)
                 {
@@ -138,6 +117,27 @@ namespace Factorio_MC_Bridge
                     }
                     catch (Exception e)
                     {
+                        Console.WriteLine("Something went wrong. Moving past error.");
+                        Console.WriteLine(e.Message);
+                        continue;
+                    }
+                }
+            } else
+            {
+                var rcon2 = new RCON(IPAddress.Parse(settings.getMcIPAddress()), (ushort)settings.getMcPort(), settings.getMcRconPass());
+                while (true)
+                {
+                    try
+                    {
+                        List<ItemPair> factorioItems = parseFactrio(settings, itemMappings, factorioRatios);
+                        List<ItemPair> minecraftItems = parseVanillaMinecraft(settings, itemMappings, minecraftRatios, rcon2).Result;
+                        sendToFactorio(minecraftItems, rcon);
+                        sendToVanillaMinecraft(factorioItems, settings, rcon2);
+                        Thread.Sleep(1000);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.InnerException);
                         Console.WriteLine("Something went wrong. Moving past error.");
                         Console.WriteLine(e.Message);
                         continue;
@@ -409,26 +409,26 @@ namespace Factorio_MC_Bridge
             if (items.Count > 0)
             {
                 String[] temp = { "" };
-                String temp2 = "";
-                String temp3 = "";
+                String RCON_Output = "";
+                String RCON_Output2 = "";
                 String temp4 = "";
                 Boolean FullFlag = false;
                 for (int i = 0; i < items.Count; i++)
                 {
-                    //String itemToSend = items[i].name + "~" + items[i].count;
-                    temp = items[i].name.Split(':');
+                    temp = items[i].name.Split(':'); //Currently only blocks work. I'm planning on adding loot tables for items later.
                     for (int j = 0; j < items[i].count; j++)
                     {
                         FullFlag = false;
                         while (!FullFlag)
                         {
-                            temp2 = await rcon.SendCommandAsync("/execute at @e[tag=ReceiveChest,limit=1,sort=arbitrary,tag=!ReceiveFull] run loot insert ~ ~ ~ loot minecraft:blocks/" + temp[1]);
-                            temp4 = temp2.Remove(0, 8);
-                            if (temp2.StartsWith("0")) //This never returns 0 because of what seems to be a bug in 18w45a
+                            //The new /loot command seems to be the only way to get chests to fill without having to specify each individual slot.
+                            RCON_Output = await rcon.SendCommandAsync("/execute at @e[tag=ReceiveChest,limit=1,sort=arbitrary,tag=!ReceiveFull] run loot insert ~ ~ ~ loot minecraft:blocks/" + temp[1]);
+                            temp4 = RCON_Output.Remove(0, 8);
+                            if (RCON_Output.StartsWith("0")) //This never returns 0 because of what seems to be a bug in 18w45a
                             {
                                 await rcon.SendCommandAsync("/tag @e[tag=ReceiveChest,limit=1,sort=arbitrary,tag=!RecieveFull] add ReceiveFull");
-                                temp3 = await rcon.SendCommandAsync("/execute if entity @e[tag=ReceiveChest,limit=1,sort=arbitrary,tag=!ReceiveFull]");
-                                if (temp3 == "Test failed")
+                                RCON_Output2 = await rcon.SendCommandAsync("/execute if entity @e[tag=ReceiveChest,limit=1,sort=arbitrary,tag=!ReceiveFull]");
+                                if (RCON_Output2 == "Test failed")
                                 {
                                     FullFlag = true;
                                 }
