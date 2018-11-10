@@ -33,14 +33,20 @@ namespace Factorio_MC_Bridge
 				StreamWriter sw = new StreamWriter(fs, Encoding.Default);
 				Console.WriteLine("Please enter Minecraft Location (Root of the Directory): ");
 				settings.setMcPath(Console.ReadLine());
-				Console.WriteLine("Please enter Factorio Server Path (Root of the Directory): ");
+                Console.WriteLine("Please enter the IP Address of the Minecraft Server: ");
+                settings.setMcIpAddress(Console.ReadLine());
+                Console.WriteLine("Please enter Minecraft RCON Port Number: ");
+                settings.setMcPort(Int32.Parse(Console.ReadLine()));
+                Console.WriteLine("Please enter Minecraft RCON password: ");
+                settings.setMcRconPass(Console.ReadLine());
+                Console.WriteLine("Please enter Factorio Server Path (Root of the Directory): ");
 				settings.setFacotrioPath(Console.ReadLine());
 				Console.WriteLine("Please enter the IP Address of the Factorio Server: ");
-				settings.setIpAddress(Console.ReadLine());
-				Console.WriteLine("Please enter RCON Port Number: ");
-				settings.setPort(Int32.Parse(Console.ReadLine()));
-				Console.WriteLine("Please enter RCON password: ");
-				settings.setRconPass(Console.ReadLine());
+				settings.setFactorioIpAddress(Console.ReadLine());
+				Console.WriteLine("Please enter Factorio RCON Port Number: ");
+				settings.setFactorioPort(Int32.Parse(Console.ReadLine()));
+				Console.WriteLine("Please enter Factorio RCON password: ");
+				settings.setFactorioRconPass(Console.ReadLine());
 				string output = JsonConvert.SerializeObject(settings);
 				sw.WriteLine(output);
 				sw.Close();
@@ -94,18 +100,20 @@ namespace Factorio_MC_Bridge
 				Parse the files and send the data to the approiate game.
 			*/
 			Console.WriteLine("Found settings. Beginning transfer.");
-			var rcon = new RCON(IPAddress.Parse(settings.getIPAddress()), (ushort)settings.getPort(), settings.getRconPass() );
-			while (true)
+			var rcon = new RCON(IPAddress.Parse(settings.getFactorioIPAddress()), (ushort)settings.getFactorioPort(), settings.getFactorioRconPass() );
+            var rcon2 = new RCON(IPAddress.Parse(settings.getMcIPAddress()), (ushort)settings.getMcPort(), settings.getMcRconPass());
+            while (true)
 			{
 				try
 				{
 					List<ItemPair> factorioItems = parseFactrio(settings, itemMappings, factorioRatios);
-					List<ItemPair> minecraftItems = parseMinecraft(settings, itemMappings, minecraftRatios);
+					List<ItemPair> minecraftItems = parseMinecraft(settings, itemMappings, minecraftRatios, rcon2).Result;
 					sendToFactorio(minecraftItems, rcon);
-					sendToMinecraft(factorioItems, settings);
+					sendToMinecraft(factorioItems, settings, rcon2);
 					Thread.Sleep(1000);
 				}
 				catch (Exception e) {
+                    Console.WriteLine(e.InnerException);
 					Console.WriteLine("Something went wrong. Moving past error.");
 					Console.WriteLine(e.Message);
 					continue;
@@ -229,42 +237,103 @@ namespace Factorio_MC_Bridge
 		/// Reading and Parsing for minecraft 
 		/// MINECRAFT
 
-		public static List<ItemPair> parseMinecraft(Settings settings, DualDictionary<String,String> mappings, Dictionary<String, double> ratios)
+		public static async System.Threading.Tasks.Task<List<ItemPair>> parseMinecraft(Settings settings, DualDictionary<String,String> mappings, Dictionary<String, double> ratios, RCON rcon)
 		{
-			List<ItemPair> items = new List<ItemPair>();
-			String fullPath = Path.Combine(settings.getMcPath(), "toFactorio.dat");
-			while (true)
-			{
-				try
-				{
-					using (FileStream Fs = new FileStream(fullPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 100))
-					{
-						break;
-					}
-				}
-				catch (IOException)
-				{
-					Thread.Sleep(100);
-				}
-			}
-			FileStream fs = new FileStream(fullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
-			StreamReader sr = new StreamReader(fs, Encoding.Default);
-			while (!sr.EndOfStream)
-			{
-				string proc = sr.ReadLine();
-				string[] temp = proc.Split('~');
-				int count = 0;
-				if (ratios.Count > 0) {
-					double readNum = Double.Parse(temp[1]) * ratios[temp[0]]; ;
-					count = (int)Math.Round(readNum, MidpointRounding.AwayFromZero);
-				}
-				else {
-					count = (int)Double.Parse(temp[1]);
-				}
-				items.Add(new ItemPair(temp[0], count));
-			}
-			sr.Close();
-			File.WriteAllText(fullPath, string.Empty);
+            //
+            //Sorry for the dumb variable names, I'm not very good about making them descriptive.
+            //
+            StringBuilder str = new StringBuilder();
+            String RCON_Output = await rcon.SendCommandAsync("/execute at @e[tag=SendChest] run data get block ~ ~ ~ Items");
+            Char[] delim1 = { '{' };
+            Char[] delim2 = { ',' };
+            Char[] delim3 = { '}', 'b' };
+            Char[] delim4 = { ']' };
+            String[] RCON_Output_List = RCON_Output.Split(delim1, StringSplitOptions.RemoveEmptyEntries);
+            String[] temp4 = { "" };
+            String[] temp5 = { "" };
+            String temp6 = "";
+            foreach (String stringy in RCON_Output_List)
+            {
+                if (string.IsNullOrWhiteSpace(stringy) == false)
+                {
+                    temp4 = stringy.Split(delim2, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (String stringy2 in temp4)
+                    {
+                        if (string.IsNullOrWhiteSpace(stringy2) == false)
+                        {
+                            if (stringy2.Contains("id:") == true)
+                            {
+                                str.Append(stringy2.Remove(0, 6).TrimEnd('"'));
+                            }
+                            if (stringy2.Contains("Count:") == true)
+                            {
+                                str.Append("~");
+                                temp5 = stringy2.Remove(0, 8).Split(delim4, StringSplitOptions.RemoveEmptyEntries);
+                                str.Append(temp5[0].TrimEnd(delim3));
+                                str.AppendLine();
+                            }
+                        }
+                    }
+                }
+            }
+            temp6 = str.ToString().TrimEnd(Environment.NewLine.ToCharArray());
+            await rcon.SendCommandAsync("/execute at @e[tag=SendChest] run data remove block ~ ~ ~ Items");
+            List<ItemPair> items = new List<ItemPair>();
+            //string proc = sr.ReadLine();
+            String[] temp7 = temp6.Split(Environment.NewLine.ToCharArray());
+            foreach (String stringy3 in temp7)
+            {
+                if (string.IsNullOrWhiteSpace(stringy3) == false)
+                {
+                    string[] temp = stringy3.Split('~');
+                    int count = 0;
+                    if (ratios.Count > 0)
+                    {
+                        double readNum = Double.Parse(temp[1]) * ratios[temp[0]]; ;
+                        count = (int)Math.Round(readNum, MidpointRounding.AwayFromZero);
+                    }
+                    else
+                    {
+                        count = (int)Double.Parse(temp[1]);
+                    }
+                    items.Add(new ItemPair(temp[0], count));
+                }
+            }
+            //String fullPath = Path.Combine(settings.getMcPath(), "toFactorio.dat");
+            //while (true)
+            //{
+            //	try
+            //	{
+            //		using (FileStream Fs = new FileStream(fullPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 100))
+            //		{
+            //			break;
+            //		}
+            //	}
+            //	catch (IOException)
+            //	{
+            //		Thread.Sleep(100);
+            //	}
+            //}
+            //FileStream fs = new FileStream(fullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+            //StreamReader sr = new StreamReader(fs, Encoding.Default);
+            //         //Console.WriteLine(str.ToString().TrimEnd(Environment.NewLine.ToCharArray()));
+            //         File.WriteAllText(fullPath, str.ToString());
+   //         while (!sr.EndOfStream)
+			//{
+			//	string proc = sr.ReadLine();
+			//	string[] temp = proc.Split('~');
+			//	int count = 0;
+			//	if (ratios.Count > 0) {
+			//		double readNum = Double.Parse(temp[1]) * ratios[temp[0]]; ;
+			//		count = (int)Math.Round(readNum, MidpointRounding.AwayFromZero);
+			//	}
+			//	else {
+			//		count = (int)Double.Parse(temp[1]);
+			//	}
+			//	items.Add(new ItemPair(temp[0], count));
+			//}
+			//sr.Close();
+			//File.WriteAllText(fullPath, string.Empty);
 
 			//Remap Items to the opposing item
 			for (int i = 0; i < items.Count; i++) {
@@ -273,29 +342,63 @@ namespace Factorio_MC_Bridge
 			return items;
 		}
 		
-		public static void sendToMinecraft(List<ItemPair> items, Settings settings) {
-			String fullPath = Path.Combine(settings.getMcPath(), "fromFactorio.dat");
-
-			while (true)
-			{
-				try
-				{
-					using (FileStream Fs = new FileStream(fullPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 100))
-					{
-						break;
-					}
-				}
-				catch (IOException)
-				{
-					Thread.Sleep(100);
-				}
-			}
-			StreamWriter sw = new StreamWriter(fullPath, true);
-			for (int i = 0; i < items.Count; i++) {
-				String itemToSend = items[i].name + "~" + items[i].count;
-				sw.WriteLine(itemToSend);
-			}
-			sw.Close();
+		public static async void sendToMinecraft(List<ItemPair> items, Settings settings, RCON rcon) {
+            //String fullPath = Path.Combine(settings.getMcPath(), "fromFactorio.dat");
+            //while (true)
+            //{
+            //	try
+            //	{
+            //		using (FileStream Fs = new FileStream(fullPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 100))
+            //		{
+            //			break;
+            //		}
+            //	}
+            //	catch (IOException)
+            //	{
+            //		Thread.Sleep(100);
+            //	}
+            //}
+            //StreamWriter sw = new StreamWriter(fullPath, true);
+            //for (int i = 0; i < items.Count; i++) {
+            //	String itemToSend = items[i].name + "~" + items[i].count;
+            //	sw.WriteLine(itemToSend);
+            //}
+            //sw.Close();
+            if (items.Count > 0)
+            {
+                String[] temp = { "" };
+                String temp2 = "";
+                String temp3 = "";
+                String temp4 = "";
+                Boolean FullFlag = false;
+                for (int i = 0; i < items.Count; i++)
+                {
+                    //String itemToSend = items[i].name + "~" + items[i].count;
+                    temp = items[i].name.Split(':');
+                    for (int j = 0; j < items[i].count; j++)
+                    {
+                        FullFlag = false;
+                        while (!FullFlag)
+                        {
+                            temp2 = await rcon.SendCommandAsync("/execute at @e[tag=ReceiveChest,limit=1,sort=arbitrary,tag=!ReceiveFull] run loot insert ~ ~ ~ loot minecraft:blocks/" + temp[1]);
+                            temp4 = temp2.Remove(0, 8);
+                            if (temp2.StartsWith("0")) //This never returns 0 because of what seems to be a bug in 18w45a
+                            {
+                                await rcon.SendCommandAsync("/tag @e[tag=ReceiveChest,limit=1,sort=arbitrary,tag=!RecieveFull] add ReceiveFull");
+                                temp3 = await rcon.SendCommandAsync("/execute if entity @e[tag=ReceiveChest,limit=1,sort=arbitrary,tag=!ReceiveFull]");
+                                if (temp3 == "Test failed")
+                                {
+                                    FullFlag = true;
+                                }
+                            } else
+                            {
+                                FullFlag = true;
+                            }
+                        }
+                        FullFlag = false;
+                    }
+                }
+            }
 		}
 
 
