@@ -31,13 +31,15 @@ namespace Factorio_MC_Bridge
 			{
 				FileStream fs = new FileStream(startupDoc, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
 				StreamWriter sw = new StreamWriter(fs, Encoding.Default);
-				Console.WriteLine("Please enter Minecraft Location (Root of the Directory): ");
+                Console.WriteLine("Please enter Minecraft Type (0=Forge,1=Vanilla 18w45a) ");
+                settings.setMcPath(Console.ReadLine());
+                Console.WriteLine("Please enter Minecraft Location (Root of the Directory): ");
 				settings.setMcPath(Console.ReadLine());
-                Console.WriteLine("Please enter the IP Address of the Minecraft Server: ");
+                Console.WriteLine("Please enter the IP Address of the Minecraft Server (only necessary for vanilla): ");
                 settings.setMcIpAddress(Console.ReadLine());
-                Console.WriteLine("Please enter Minecraft RCON Port Number: ");
+                Console.WriteLine("Please enter Minecraft RCON Port Number (only necessary for vanilla): ");
                 settings.setMcPort(Int32.Parse(Console.ReadLine()));
-                Console.WriteLine("Please enter Minecraft RCON password: ");
+                Console.WriteLine("Please enter Minecraft RCON password (only necessary for vanilla): ");
                 settings.setMcRconPass(Console.ReadLine());
                 Console.WriteLine("Please enter Factorio Server Path (Root of the Directory): ");
 				settings.setFacotrioPath(Console.ReadLine());
@@ -102,23 +104,46 @@ namespace Factorio_MC_Bridge
 			Console.WriteLine("Found settings. Beginning transfer.");
 			var rcon = new RCON(IPAddress.Parse(settings.getFactorioIPAddress()), (ushort)settings.getFactorioPort(), settings.getFactorioRconPass() );
             var rcon2 = new RCON(IPAddress.Parse(settings.getMcIPAddress()), (ushort)settings.getMcPort(), settings.getMcRconPass());
-            while (true)
-			{
-				try
-				{
-					List<ItemPair> factorioItems = parseFactrio(settings, itemMappings, factorioRatios);
-					List<ItemPair> minecraftItems = parseMinecraft(settings, itemMappings, minecraftRatios, rcon2).Result;
-					sendToFactorio(minecraftItems, rcon);
-					sendToMinecraft(factorioItems, settings, rcon2);
-					Thread.Sleep(1000);
-				}
-				catch (Exception e) {
-                    Console.WriteLine(e.InnerException);
-					Console.WriteLine("Something went wrong. Moving past error.");
-					Console.WriteLine(e.Message);
-					continue;
-				}
-			}
+            if (settings.getMcType() == 1)
+            {
+                while (true)
+                {
+                    try
+                    {
+                        List<ItemPair> factorioItems = parseFactrio(settings, itemMappings, factorioRatios);
+                        List<ItemPair> minecraftItems = parseVanillaMinecraft(settings, itemMappings, minecraftRatios, rcon2).Result;
+                        sendToFactorio(minecraftItems, rcon);
+                        sendToVanillaMinecraft(factorioItems, settings, rcon2);
+                        Thread.Sleep(1000);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.InnerException);
+                        Console.WriteLine("Something went wrong. Moving past error.");
+                        Console.WriteLine(e.Message);
+                        continue;
+                    }
+                }
+            } else
+            {
+                while (true)
+                {
+                    try
+                    {
+                        List<ItemPair> factorioItems = parseFactrio(settings, itemMappings, factorioRatios);
+                        List<ItemPair> minecraftItems = parseMinecraft(settings, itemMappings, minecraftRatios);
+                        sendToFactorio(minecraftItems, rcon);
+                        sendToMinecraft(factorioItems, settings);
+                        Thread.Sleep(1000);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Something went wrong. Moving past error.");
+                        Console.WriteLine(e.Message);
+                        continue;
+                    }
+                }
+            }
 		}
 
 		/// FACTORIO
@@ -233,31 +258,78 @@ namespace Factorio_MC_Bridge
 			return items;
 		}
 
-		/// MINECRAFT
-		/// Reading and Parsing for minecraft 
-		/// MINECRAFT
+        /// MINECRAFT
+        /// Reading and Parsing for minecraft 
+        /// MINECRAFT
 
-		public static async System.Threading.Tasks.Task<List<ItemPair>> parseMinecraft(Settings settings, DualDictionary<String,String> mappings, Dictionary<String, double> ratios, RCON rcon)
+        public static List<ItemPair> parseMinecraft(Settings settings, DualDictionary<String, String> mappings, Dictionary<String, double> ratios)
+        {
+            List<ItemPair> items = new List<ItemPair>();
+            String fullPath = Path.Combine(settings.getMcPath(), "toFactorio.dat");
+            while (true)
+            {
+                try
+                {
+                    using (FileStream Fs = new FileStream(fullPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 100))
+                    {
+                        break;
+                    }
+                }
+                catch (IOException)
+                {
+                    Thread.Sleep(100);
+                }
+            }
+            FileStream fs = new FileStream(fullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+            StreamReader sr = new StreamReader(fs, Encoding.Default);
+            while (!sr.EndOfStream)
+            {
+                string proc = sr.ReadLine();
+                string[] temp = proc.Split('~');
+                int count = 0;
+                if (ratios.Count > 0)
+                {
+                    double readNum = Double.Parse(temp[1]) * ratios[temp[0]]; ;
+                    count = (int)Math.Round(readNum, MidpointRounding.AwayFromZero);
+                }
+                else
+                {
+                    count = (int)Double.Parse(temp[1]);
+                }
+                items.Add(new ItemPair(temp[0], count));
+            }
+            sr.Close();
+            File.WriteAllText(fullPath, string.Empty);
+
+            //Remap Items to the opposing item
+            for (int i = 0; i < items.Count; i++)
+            {
+                items[i].name = mappings.minecraft[items[i].name];
+            }
+            return items;
+        }
+
+        public static async System.Threading.Tasks.Task<List<ItemPair>> parseVanillaMinecraft(Settings settings, DualDictionary<String,String> mappings, Dictionary<String, double> ratios, RCON rcon)
 		{
-            //
-            //Sorry for the dumb variable names, I'm not very good about making them descriptive.
-            //
+            ///
+            ///Sorry for the dumb variable names, I'm not very good about making them descriptive.
+            ///
             StringBuilder str = new StringBuilder();
             String RCON_Output = await rcon.SendCommandAsync("/execute at @e[tag=SendChest] run data get block ~ ~ ~ Items");
             Char[] delim1 = { '{' };
-            Char[] delim2 = { ',' };
+            Char[] delim2 = { ',' }; //None of the syntax I tried ended up working when including the remove empty entires flag.
             Char[] delim3 = { '}', 'b' };
             Char[] delim4 = { ']' };
             String[] RCON_Output_List = RCON_Output.Split(delim1, StringSplitOptions.RemoveEmptyEntries);
-            String[] temp4 = { "" };
+            String[] NBT_Output = { "" };
             String[] temp5 = { "" };
-            String temp6 = "";
+            String toFactorioString = "";
             foreach (String stringy in RCON_Output_List)
             {
                 if (string.IsNullOrWhiteSpace(stringy) == false)
                 {
-                    temp4 = stringy.Split(delim2, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (String stringy2 in temp4)
+                    NBT_Output = stringy.Split(delim2, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (String stringy2 in NBT_Output)
                     {
                         if (string.IsNullOrWhiteSpace(stringy2) == false)
                         {
@@ -276,11 +348,10 @@ namespace Factorio_MC_Bridge
                     }
                 }
             }
-            temp6 = str.ToString().TrimEnd(Environment.NewLine.ToCharArray());
+            toFactorioString = str.ToString().TrimEnd(Environment.NewLine.ToCharArray());
             await rcon.SendCommandAsync("/execute at @e[tag=SendChest] run data remove block ~ ~ ~ Items");
             List<ItemPair> items = new List<ItemPair>();
-            //string proc = sr.ReadLine();
-            String[] temp7 = temp6.Split(Environment.NewLine.ToCharArray());
+            String[] temp7 = toFactorioString.Split(Environment.NewLine.ToCharArray());
             foreach (String stringy3 in temp7)
             {
                 if (string.IsNullOrWhiteSpace(stringy3) == false)
@@ -299,41 +370,6 @@ namespace Factorio_MC_Bridge
                     items.Add(new ItemPair(temp[0], count));
                 }
             }
-            //String fullPath = Path.Combine(settings.getMcPath(), "toFactorio.dat");
-            //while (true)
-            //{
-            //	try
-            //	{
-            //		using (FileStream Fs = new FileStream(fullPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 100))
-            //		{
-            //			break;
-            //		}
-            //	}
-            //	catch (IOException)
-            //	{
-            //		Thread.Sleep(100);
-            //	}
-            //}
-            //FileStream fs = new FileStream(fullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
-            //StreamReader sr = new StreamReader(fs, Encoding.Default);
-            //         //Console.WriteLine(str.ToString().TrimEnd(Environment.NewLine.ToCharArray()));
-            //         File.WriteAllText(fullPath, str.ToString());
-   //         while (!sr.EndOfStream)
-			//{
-			//	string proc = sr.ReadLine();
-			//	string[] temp = proc.Split('~');
-			//	int count = 0;
-			//	if (ratios.Count > 0) {
-			//		double readNum = Double.Parse(temp[1]) * ratios[temp[0]]; ;
-			//		count = (int)Math.Round(readNum, MidpointRounding.AwayFromZero);
-			//	}
-			//	else {
-			//		count = (int)Double.Parse(temp[1]);
-			//	}
-			//	items.Add(new ItemPair(temp[0], count));
-			//}
-			//sr.Close();
-			//File.WriteAllText(fullPath, string.Empty);
 
 			//Remap Items to the opposing item
 			for (int i = 0; i < items.Count; i++) {
@@ -341,29 +377,35 @@ namespace Factorio_MC_Bridge
 			}
 			return items;
 		}
-		
-		public static async void sendToMinecraft(List<ItemPair> items, Settings settings, RCON rcon) {
-            //String fullPath = Path.Combine(settings.getMcPath(), "fromFactorio.dat");
-            //while (true)
-            //{
-            //	try
-            //	{
-            //		using (FileStream Fs = new FileStream(fullPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 100))
-            //		{
-            //			break;
-            //		}
-            //	}
-            //	catch (IOException)
-            //	{
-            //		Thread.Sleep(100);
-            //	}
-            //}
-            //StreamWriter sw = new StreamWriter(fullPath, true);
-            //for (int i = 0; i < items.Count; i++) {
-            //	String itemToSend = items[i].name + "~" + items[i].count;
-            //	sw.WriteLine(itemToSend);
-            //}
-            //sw.Close();
+
+        public static void sendToMinecraft(List<ItemPair> items, Settings settings)
+        {
+            String fullPath = Path.Combine(settings.getMcPath(), "fromFactorio.dat");
+
+            while (true)
+            {
+                try
+                {
+                    using (FileStream Fs = new FileStream(fullPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None, 100))
+                    {
+                        break;
+                    }
+                }
+                catch (IOException)
+                {
+                    Thread.Sleep(100);
+                }
+            }
+            StreamWriter sw = new StreamWriter(fullPath, true);
+            for (int i = 0; i < items.Count; i++)
+            {
+                String itemToSend = items[i].name + "~" + items[i].count;
+                sw.WriteLine(itemToSend);
+            }
+            sw.Close();
+        }
+
+        public static async void sendToVanillaMinecraft(List<ItemPair> items, Settings settings, RCON rcon) {
             if (items.Count > 0)
             {
                 String[] temp = { "" };

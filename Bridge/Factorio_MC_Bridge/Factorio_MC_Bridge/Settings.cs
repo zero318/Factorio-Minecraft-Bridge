@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Factorio_MC_Bridge {
 	class Settings {
+        public int mcType = 0;
 		public String mcPath = "";
         public String mcIpAddress = "";
         public int mcPortNumber = 0;
@@ -18,7 +19,12 @@ namespace Factorio_MC_Bridge {
 		public Settings() {
 		}
 
-		public String getMcPath() {
+        public int getMcType()
+        {
+            return mcType;
+        }
+
+        public String getMcPath() {
 			return mcPath;
 		}
 
@@ -54,7 +60,11 @@ namespace Factorio_MC_Bridge {
 		}
 
 
-		public void setMcPath(String s) {
+        public void setMcType(int x)
+        {
+            mcType = x;
+        }
+        public void setMcPath(String s) {
 			mcPath = s;
 		}
         public void setMcIpAddress(String s)
