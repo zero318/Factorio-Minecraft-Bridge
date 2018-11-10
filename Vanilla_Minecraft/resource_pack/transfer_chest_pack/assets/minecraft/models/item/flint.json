@@ -1,0 +1,12 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "item/flint"
+    },
+	"overrides": [
+		{ "predicate": { "custom_model_data": 1 }, "model": "fmcbridge:block/tcrblock" },
+        { "predicate": { "custom_model_data": 2 }, "model": "fmcbridge:block/tcsblock" },
+        { "predicate": { "custom_model_data": 3 }, "model": "fmcbridge:block/tcrmanagerblock" },
+        { "predicate": { "custom_model_data": 4 }, "model": "fmcbridge:block/tcsmanagerblock" }
+	]
+}

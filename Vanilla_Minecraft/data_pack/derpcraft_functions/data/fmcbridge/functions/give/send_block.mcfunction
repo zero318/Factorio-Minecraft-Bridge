@@ -1,0 +1,1 @@
+give @s minecraft:armor_stand{EntityTag:{Invulnerable:1,Marker:1,NoGravity:1,ArmorItems:[{},{},{},{id:"minecraft:flint",Count:1,tag:{CustomModelData:2}}],Tags:["TransferChest","SendChest"]},display:{Name:"{\"text\":\"Send Block\",\"italic\":false}"},CustomModelData:2}
