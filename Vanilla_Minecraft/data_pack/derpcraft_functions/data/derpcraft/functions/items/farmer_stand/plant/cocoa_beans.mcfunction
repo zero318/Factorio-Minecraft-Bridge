@@ -1,0 +1,5 @@
+execute unless block ~ ~ ~ minecraft:cocoa if block ~1 ~ ~ #derpcraft:farmer_stand/cocoa_beans run setblock ~ ~ ~ minecraft:cocoa[facing=east]
+execute unless block ~ ~ ~ minecraft:cocoa if block ~-1 ~ ~ #derpcraft:farmer_stand/cocoa_beans run setblock ~ ~ ~ minecraft:cocoa[facing=west]
+execute unless block ~ ~ ~ minecraft:cocoa if block ~ ~ ~1 #derpcraft:farmer_stand/cocoa_beans run setblock ~ ~ ~ minecraft:cocoa[facing=south]
+execute unless block ~ ~ ~ minecraft:cocoa if block ~ ~ ~-1 #derpcraft:farmer_stand/cocoa_beans run setblock ~ ~ ~ minecraft:cocoa[facing=north]
+execute if block ~ ~ ~ minecraft:cocoa run kill @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:cocoa_beans"}}]

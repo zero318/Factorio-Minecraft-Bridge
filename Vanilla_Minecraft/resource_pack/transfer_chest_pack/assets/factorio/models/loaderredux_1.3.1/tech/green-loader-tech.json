@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:loaderredux_1.3.1/tech/green-loader-tech"
+    }
+}

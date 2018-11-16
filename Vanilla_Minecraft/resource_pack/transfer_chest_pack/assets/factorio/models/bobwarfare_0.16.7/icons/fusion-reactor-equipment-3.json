@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:bobwarfare_0.16.7/icons/fusion-reactor-equipment-3"
+    }
+}

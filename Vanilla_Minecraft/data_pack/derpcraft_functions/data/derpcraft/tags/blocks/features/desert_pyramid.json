@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:sandstone",
+    "minecraft:cut_sandstone",
+    "minecraft:chiseled_sandstone",
+    "minecraft:sandstone_stairs",
+    "minecraft:orange_terracotta",
+    "minecraft:blue_terracotta",
+    "minecraft:stone_pressure_plate",
+    "minecraft:chest",
+    "minecraft:tnt"
+  ]
+}

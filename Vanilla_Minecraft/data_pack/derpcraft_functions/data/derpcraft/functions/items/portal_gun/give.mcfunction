@@ -1,0 +1,1 @@
+give @s minecraft:carrot_on_a_stick{display:{Name:"{\"text\":\"Portal Gun\",\"color\":\"blue\",\"italic\":false}"},Unbreakable:1,HideFlags:4,Damage:24}

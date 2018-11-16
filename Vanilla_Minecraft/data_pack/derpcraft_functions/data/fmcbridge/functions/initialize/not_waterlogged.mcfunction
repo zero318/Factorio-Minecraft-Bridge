@@ -1,0 +1,8 @@
+execute if entity @s[nbt={Rotation:[45.0f]}] run setblock ~ ~ ~ minecraft:chest[facing=west,type=single,waterlogged=false]
+execute if entity @s[nbt={Rotation:[90.0f]}] run setblock ~ ~ ~ minecraft:chest[facing=west,type=single,waterlogged=false]
+execute if entity @s[nbt={Rotation:[135.0f]}] run setblock ~ ~ ~ minecraft:chest[facing=north,type=single,waterlogged=false]
+execute if entity @s[nbt={Rotation:[180.0f]}] run setblock ~ ~ ~ minecraft:chest[facing=north,type=single,waterlogged=false]
+execute if entity @s[nbt={Rotation:[-135.0f]}] run setblock ~ ~ ~ minecraft:chest[facing=east,type=single,waterlogged=false]
+execute if entity @s[nbt={Rotation:[-90.0f]}] run setblock ~ ~ ~ minecraft:chest[facing=east,type=single,waterlogged=false]
+execute if entity @s[nbt={Rotation:[-45.0f]}] run setblock ~ ~ ~ minecraft:chest[facing=south,type=single,waterlogged=false]
+execute unless block ~ ~ ~ minecraft:chest run setblock ~ ~ ~ minecraft:chest[facing=south,type=single,waterlogged=false]

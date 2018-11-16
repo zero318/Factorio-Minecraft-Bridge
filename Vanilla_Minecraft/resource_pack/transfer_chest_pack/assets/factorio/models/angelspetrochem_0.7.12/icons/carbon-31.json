@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:angelspetrochem_0.7.12/icons/carbon-31"
+    }
+}

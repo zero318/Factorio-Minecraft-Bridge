@@ -1,0 +1,1 @@
+execute if score AdventureMap DerpcraftData matches 1 run function derpcraft:adventure_map/main

@@ -1,0 +1,19 @@
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:wheat_seeds"}}] if block ~ ~-1 ~ minecraft:farmland run function derpcraft:items/farmer_stand/plant/wheat_seeds
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:carrot"}}] if block ~ ~-1 ~ minecraft:farmland run function derpcraft:items/farmer_stand/plant/carrot
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:potato"}}] if block ~ ~-1 ~ minecraft:farmland run function derpcraft:items/farmer_stand/plant/potato
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:beetroot_seeds"}}] if block ~ ~-1 ~ minecraft:farmland run function derpcraft:items/farmer_stand/plant/beetroot_seeds
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:melon_seeds"}}] if block ~ ~-1 ~ minecraft:farmland run function derpcraft:items/farmer_stand/plant/melon_seeds
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:pumpkin_seeds"}}] if block ~ ~-1 ~ minecraft:farmland run function derpcraft:items/farmer_stand/plant/pumpkin_seeds
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:nether_wart"}}] if block ~ ~-1 ~ minecraft:soul_sand run function derpcraft:items/farmer_stand/plant/nether_wart
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:cactus"}}] if block ~ ~-1 ~ #derpcraft:farmer_stand/cactus run function derpcraft:items/farmer_stand/plant/cactus
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:brown_mushroom"}}] if block ~ ~-1 ~ #derpcraft:farmer_stand/mushroom run function derpcraft:items/farmer_stand/plant/brown_mushroom
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:red_mushroom"}}] if block ~ ~-1 ~ #derpcraft:farmer_stand/mushroom run function derpcraft:items/farmer_stand/plant/red_mushroom
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:chorus_flower"}}] run function derpcraft:items/farmer_stand/plant/chorus_flower
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:sugar_cane"}}] run function derpcraft:items/farmer_stand/plant/sugar_cane
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:cocoa_beans"}}] run function derpcraft:items/farmer_stand/plant/cocoa_beans
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:oak_sapling"}}] if block ~ ~-1 ~ #derpcraft:farmer_stand/sapling run function derpcraft:items/farmer_stand/plant/oak_sapling
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:birch_sapling"}}] if block ~ ~-1 ~ #derpcraft:farmer_stand/sapling run function derpcraft:items/farmer_stand/plant/birch_sapling
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:spruce_sapling"}}] if block ~ ~-1 ~ #derpcraft:farmer_stand/sapling run function derpcraft:items/farmer_stand/plant/spruce_sapling
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:jungle_sapling"}}] if block ~ ~-1 ~ #derpcraft:farmer_stand/sapling run function derpcraft:items/farmer_stand/plant/jungle_sapling
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:acacia_sapling"}}] if block ~ ~-1 ~ #derpcraft:farmer_stand/sapling run function derpcraft:items/farmer_stand/plant/acacia_sapling
+execute if entity @e[type=minecraft:item,dx=1,dy=1,dz=1,nbt={Item:{id:"minecraft:dark_oak_sapling"}}] if block ~ ~-1 ~ #derpcraft:farmer_stand/sapling run function derpcraft:items/farmer_stand/plant/dark_oak_sapling

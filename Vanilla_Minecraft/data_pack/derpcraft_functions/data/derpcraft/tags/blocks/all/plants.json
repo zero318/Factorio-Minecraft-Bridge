@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "#derpcraft:all/single_plants",
+    "#derpcraft:all/double_plants",
+    "#derpcraft:all/crops",
+    "#minecraft:leaves",
+    "#minecraft:saplings",
+    "minecraft:vine",
+    "minecraft:cactus",
+    "minecraft:chorus_plant",
+    "minecraft:chorus_flower",
+    "minecraft:lily_pad",
+    "minecraft:seagrass",
+    "minecraft:tall_seagrass",
+    "minecraft:sea_pickle"
+  ]
+}

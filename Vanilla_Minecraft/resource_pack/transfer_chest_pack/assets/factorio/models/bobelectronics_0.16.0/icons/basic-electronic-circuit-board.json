@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:bobelectronics_0.16.0/icons/basic-electronic-circuit-board"
+    }
+}

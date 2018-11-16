@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:grass_path",
+    "minecraft:oak_planks",
+    "minecraft:acacia_planks",
+    "minecraft:gravel",
+    "minecraft:spruce_planks",
+    "minecraft:cobblestone_stairs"
+  ]
+}

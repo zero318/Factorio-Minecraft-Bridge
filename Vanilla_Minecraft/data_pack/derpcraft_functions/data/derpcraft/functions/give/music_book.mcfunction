@@ -1,0 +1,1 @@
+function derpcraft:music/book/give_v12

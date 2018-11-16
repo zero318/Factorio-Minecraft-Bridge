@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:shinybobgfx_0.16.21/icons/bob-gun-turret-3"
+    }
+}

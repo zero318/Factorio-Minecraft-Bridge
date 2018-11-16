@@ -1,0 +1,4 @@
+execute if entity @a[nbt={Inventory:[{Slot:100b,tag:{CustomBlock:1}}]}] as @a[nbt={Inventory:[{Slot:100b,tag:{CustomBlock:1}}]}] run function derpcraft:blocks/sub_test_block_feet
+execute if entity @a[nbt={Inventory:[{Slot:101b,tag:{CustomBlock:1}}]}] as @a[nbt={Inventory:[{Slot:101b,tag:{CustomBlock:1}}]}] run function derpcraft:blocks/sub_test_block_legs
+execute if entity @a[nbt={Inventory:[{Slot:102b,tag:{CustomBlock:1}}]}] as @a[nbt={Inventory:[{Slot:102b,tag:{CustomBlock:1}}]}] run function derpcraft:blocks/sub_test_block_chest
+execute if entity @a[nbt={Inventory:[{Slot:103b,tag:{CustomBlock:1}}]}] as @a[nbt={Inventory:[{Slot:103b,tag:{CustomBlock:1}}]}] run function derpcraft:blocks/sub_test_block_head

@@ -1,0 +1,1 @@
+execute if score EnderCrafting DerpcraftData matches 1 run function derpcraft:nbt_crafting/main

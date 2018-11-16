@@ -1,0 +1,28 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:barrier"
+    },
+    "title": {
+      "text": "Remove Jump Boost I"
+    },
+    "description": {
+      "text": "Constant Effect"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": false,
+    "hidden": true
+  },
+  "criteria": {
+    "example": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "derpcraft:skills/jump_boost_1_remove"
+      }
+    }
+  },
+  "rewards": {
+    "function": "derpcraft:skills/jump_boost_1_remove"
+  }
+}

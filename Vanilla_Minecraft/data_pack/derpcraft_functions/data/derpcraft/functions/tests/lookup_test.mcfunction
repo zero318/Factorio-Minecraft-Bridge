@@ -1,0 +1,1 @@
+execute as @e[scores={LookupTest=0}] at @s store result score @s LookupReturn run function derpcraft:subroutines/lookup_loop

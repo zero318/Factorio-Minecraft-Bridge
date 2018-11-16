@@ -1,0 +1,21 @@
+data merge entity @s[nbt={Profession:0,Career:1}] {CustomName:"{\"text\":\"Farmer\"}"}
+data merge entity @s[nbt={Profession:0,Career:2}] {CustomName:"{\"text\":\"Fisherman\"}"}
+data merge entity @s[nbt={Profession:0,Career:3}] {CustomName:"{\"text\":\"Shepherd\"}"}
+data merge entity @s[nbt={Profession:0,Career:4}] {CustomName:"{\"text\":\"Fletcher\"}"}
+data merge entity @s[nbt={Profession:1,Career:1}] {CustomName:"{\"text\":\"Librarian\"}"}
+data merge entity @s[nbt={Profession:1,Career:2}] {CustomName:"{\"text\":\"Cartographer\"}"}
+data merge entity @s[nbt={Profession:2,Career:1}] {CustomName:"{\"text\":\"Priest\"}"}
+data merge entity @s[nbt={Profession:3,Career:1}] {CustomName:"{\"text\":\"Armorer\"}"}
+data merge entity @s[nbt={Profession:3,Career:2}] {CustomName:"{\"text\":\"Weapon Smith\"}"}
+data merge entity @s[nbt={Profession:3,Career:3}] {CustomName:"{\"text\":\"Tool Smith\"}"}
+data merge entity @s[nbt={Profession:4,Career:1}] {CustomName:"{\"text\":\"Butcher\"}"}
+data merge entity @s[nbt={Profession:4,Career:2}] {CustomName:"{\"text\":\"Leatherworker\"}"}
+data merge entity @s[nbt={Profession:5,Career:1}] {CustomName:"{\"text\":\"Apothecary\"}"}
+data merge entity @s[nbt={Profession:5,Career:2}] {CustomName:"{\"text\":\"Wizard\"}"}
+data merge entity @s[nbt={Profession:5,Career:3}] {CustomName:"{\"text\":\"Mechanic\"}"}
+data merge entity @s[nbt={Profession:5,Career:4}] {CustomName:"{\"text\":\"Monster Tamer\"}"}
+data merge entity @s[nbt={Profession:5,Career:5}] {CustomName:"{\"text\":\"\"}"}
+data merge entity @s[nbt={Profession:5,Career:6}] {CustomName:"{\"text\":\"Occultist\"}"}
+data merge entity @s[nbt={Profession:5,Career:7}] {CustomName:"{\"text\":\"Alchemist\"}"}
+data merge entity @s[nbt={Profession:5,Career:8}] {CustomName:"{\"text\":\"Nitwit\"}"}
+tag @s add NamedVillager

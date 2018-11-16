@@ -1,0 +1,2 @@
+execute as @e[tag=FarmerStand] at @s if block ~ ~ ~ #derpcraft:all/airs align xyz if entity @e[type=minecraft:item,dx=1,dy=1,dz=1] run function derpcraft:items/farmer_stand/sub_detect_plant
+execute as @e[tag=FarmerStand] at @s if block ~ ~ ~ minecraft:water align xyz if entity @e[type=minecraft:item,dx=1,dy=1,dz=1] run function derpcraft:items/farmer_stand/sub_detect_water_plant

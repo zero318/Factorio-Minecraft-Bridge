@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:angelsindustries_0.1.0/icons/datacore-energy-1"
+    }
+}

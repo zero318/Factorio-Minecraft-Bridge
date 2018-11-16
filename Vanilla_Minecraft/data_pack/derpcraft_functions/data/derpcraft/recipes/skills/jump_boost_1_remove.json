@@ -1,0 +1,12 @@
+{
+  "type": "crafting_shapeless",
+  "group": "skill",
+  "ingredients": [
+    {
+      "item": "minecraft:debug_stick"
+    }
+  ],
+  "result": {
+    "item": "minecraft:barrier"
+  }
+}

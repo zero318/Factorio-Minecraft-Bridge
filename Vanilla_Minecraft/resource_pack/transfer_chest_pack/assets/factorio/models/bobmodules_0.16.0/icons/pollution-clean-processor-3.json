@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:bobmodules_0.16.0/icons/pollution-clean-processor-3"
+    }
+}

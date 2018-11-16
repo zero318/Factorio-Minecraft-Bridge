@@ -1,0 +1,1 @@
+execute as @e[tag=GenerateID] run execute as @e[scores={LookupTest=1..}] at @s run execute as @e[limit=1,sort=nearest] at @s run function derpcraft:subroutines/generate_new_id_1

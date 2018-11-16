@@ -1,0 +1,1 @@
+function derpcraft:items/farmer_stand/give

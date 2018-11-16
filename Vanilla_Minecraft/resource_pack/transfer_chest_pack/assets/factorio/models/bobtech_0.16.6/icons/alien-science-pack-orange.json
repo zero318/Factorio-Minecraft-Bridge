@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:bobtech_0.16.6/icons/alien-science-pack-orange"
+    }
+}

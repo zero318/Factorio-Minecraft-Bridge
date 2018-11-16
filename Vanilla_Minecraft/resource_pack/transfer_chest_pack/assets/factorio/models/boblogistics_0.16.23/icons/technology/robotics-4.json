@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:boblogistics_0.16.23/icons/technology/robotics-4"
+    }
+}

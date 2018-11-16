@@ -1,0 +1,1 @@
+execute if entity @a[tag=!HasDerpcraftID] as @a[tag=!HasDerpcraftID] run function derpcraft:new_player

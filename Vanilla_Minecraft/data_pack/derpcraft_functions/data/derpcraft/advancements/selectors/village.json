@@ -1,0 +1,27 @@
+{
+    "display": {
+    "icon": {
+      "item": "minecraft:diamond_boots"
+    },
+    "title": {
+      "text": "Village"
+    },
+    "description": {
+      "text": "pingas"
+    },
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    },
+    "village": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "feature": "Village"
+      }
+    }
+  }
+}

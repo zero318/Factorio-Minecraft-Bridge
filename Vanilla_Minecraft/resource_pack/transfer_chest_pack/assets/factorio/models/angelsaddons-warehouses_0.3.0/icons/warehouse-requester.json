@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:angelsaddons-warehouses_0.3.0/icons/warehouse-requester"
+    }
+}

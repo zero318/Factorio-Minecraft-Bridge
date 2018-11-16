@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:knowledge_book"
+    },
+    "title": {
+      "text": "Skills"
+    },
+    "description": {
+      "text": "How to Succ Less"
+    },
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false,
+    "background": "derpcraft:textures/gui/advancements/backgrounds/sexy_fur_seal.png"
+  },
+  "criteria": {
+    "succ": {
+      "trigger": "minecraft:tick"
+    }
+  }
+}

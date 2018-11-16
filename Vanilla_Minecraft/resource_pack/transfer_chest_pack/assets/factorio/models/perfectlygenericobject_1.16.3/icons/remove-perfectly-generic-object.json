@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:perfectlygenericobject_1.16.3/icons/remove-perfectly-generic-object"
+    }
+}

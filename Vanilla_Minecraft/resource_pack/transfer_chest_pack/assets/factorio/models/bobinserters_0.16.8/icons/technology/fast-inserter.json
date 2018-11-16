@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:bobinserters_0.16.8/icons/technology/fast-inserter"
+    }
+}

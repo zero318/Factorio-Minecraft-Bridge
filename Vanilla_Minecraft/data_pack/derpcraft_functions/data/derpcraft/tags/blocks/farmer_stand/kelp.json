@@ -1,0 +1,18 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:gravel",
+    "minecraft:stone",
+    "minecraft:diorite",
+    "minecraft:andesite",
+    "minecraft:granite",
+    "minecraft:cobblestone",
+    "minecraft:dirt",
+    "minecraft:glowstone",
+    "minecraft:sea_lantern",
+    "minecraft:bedrock",
+    "#derpcraft:all/glass_blocks",
+    "minecraft:sand",
+    "minecraft:kelp"
+  ]
+}

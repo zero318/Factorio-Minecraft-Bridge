@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:bobores_0.16.2/icons/nickel-ore"
+    }
+}

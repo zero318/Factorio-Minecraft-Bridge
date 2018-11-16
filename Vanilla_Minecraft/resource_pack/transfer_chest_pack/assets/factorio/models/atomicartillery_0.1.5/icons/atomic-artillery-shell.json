@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:atomicartillery_0.1.5/icons/atomic-artillery-shell"
+    }
+}

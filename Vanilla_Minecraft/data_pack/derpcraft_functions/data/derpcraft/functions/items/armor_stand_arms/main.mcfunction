@@ -1,0 +1,1 @@
+execute as @e[type=minecraft:armor_stand,tag=] run function derpcraft:items/armor_stand_arms/sub_give_arms

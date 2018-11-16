@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:angelsaddons-oresilos_0.4.0/icons/silo-ore1"
+    }
+}

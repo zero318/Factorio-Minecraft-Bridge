@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:bobrevamp_0.16.3/icons/nitrogen-dioxide"
+    }
+}

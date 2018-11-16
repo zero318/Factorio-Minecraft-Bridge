@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
 using System.IO;
@@ -27,12 +28,13 @@ namespace Factorio_MC_Bridge
 			string choice = Console.ReadLine();
 			Settings settings = new Settings();
 			string startupDoc = Path.Combine(Environment.CurrentDirectory, "settings.json");
-			if (!File.Exists(startupDoc) || choice.Equals("1"))
-			{
-				FileStream fs = new FileStream(startupDoc, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
+            //if (!File.Exists(startupDoc))
+            if (!File.Exists(startupDoc) || choice.Equals("1"))
+            {
+                FileStream fs = new FileStream(startupDoc, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
 				StreamWriter sw = new StreamWriter(fs, Encoding.Default);
-                Console.WriteLine("Please enter Minecraft Type (0=Forge,1=Vanilla 18w45a) ");
-                settings.setMcPath(Console.ReadLine());
+                Console.WriteLine("Please enter Minecraft Type (0=Forge,1=Vanilla 18w46a) ");
+                settings.setMcType(Int32.Parse(Console.ReadLine()));
                 Console.WriteLine("Please enter Minecraft Location (Root of the Directory): ");
 				settings.setMcPath(Console.ReadLine());
                 Console.WriteLine("Please enter the IP Address of the Minecraft Server (only necessary for vanilla): ");
@@ -111,7 +113,7 @@ namespace Factorio_MC_Bridge
                     {
                         List<ItemPair> factorioItems = parseFactrio(settings, itemMappings, factorioRatios);
                         List<ItemPair> minecraftItems = parseMinecraft(settings, itemMappings, minecraftRatios);
-                        sendToFactorio(minecraftItems, rcon);
+                        //sendToFactorio(minecraftItems, rcon);
                         sendToMinecraft(factorioItems, settings);
                         Thread.Sleep(1000);
                     }
@@ -122,13 +124,15 @@ namespace Factorio_MC_Bridge
                         continue;
                     }
                 }
-            } else
+            }
+            else
             {
                 var rcon2 = new RCON(IPAddress.Parse(settings.getMcIPAddress()), (ushort)settings.getMcPort(), settings.getMcRconPass());
                 while (true)
                 {
                     try
                     {
+                        
                         List<ItemPair> factorioItems = parseFactrio(settings, itemMappings, factorioRatios);
                         List<ItemPair> minecraftItems = parseVanillaMinecraft(settings, itemMappings, minecraftRatios, rcon2).Result;
                         sendToFactorio(minecraftItems, rcon);
@@ -304,52 +308,73 @@ namespace Factorio_MC_Bridge
             //Remap Items to the opposing item
             for (int i = 0; i < items.Count; i++)
             {
-                items[i].name = mappings.minecraft[items[i].name];
+                try
+                {
+                    items[i].name = mappings.minecraft[items[i].name];
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.InnerException);
+                    Console.WriteLine("Something went wrong. Moving past error.");
+                    Console.WriteLine(e.Message);
+                    continue;
+                }
             }
             return items;
         }
 
         public static async System.Threading.Tasks.Task<List<ItemPair>> parseVanillaMinecraft(Settings settings, DualDictionary<String,String> mappings, Dictionary<String, double> ratios, RCON rcon)
 		{
+            String RCON_Output = await rcon.SendCommandAsync("execute as @e[tag=SendChest] at @s store result entity @s ArmorItems[3].tag.ClearItems int 1 run data get block ~ ~ ~ Items");
+            //String RCON_Output = await rcon.SendCommandAsync("execute as @e[tag=SendChest] at @s run data get block ~ ~ ~ Items");
             ///
-            ///Sorry for the dumb variable names, I'm not very good about making them descriptive.
+            ///This section of regex is mostly trial and error.
+            ///It seems to break if too much is thrown at it at once however.
             ///
-            StringBuilder str = new StringBuilder();
-            String RCON_Output = await rcon.SendCommandAsync("/execute at @e[tag=SendChest] run data get block ~ ~ ~ Items");
-            Char[] delim1 = { '{' };
-            Char[] delim2 = { ',' }; //None of the syntax I tried ended up working when including the remove empty entires flag.
-            Char[] delim3 = { '}', 'b' };
-            Char[] delim4 = { ']' };
-            String[] RCON_Output_List = RCON_Output.Split(delim1, StringSplitOptions.RemoveEmptyEntries);
-            String[] NBT_Output = { "" };
-            String[] temp5 = { "" };
             String toFactorioString = "";
-            foreach (String stringy in RCON_Output_List)
+            if (RCON_Output != "")
             {
-                if (string.IsNullOrWhiteSpace(stringy) == false)
+                var regex = new Regex(@"^.*?(?<=has the following block data: \[)|(?=\]-?[0-9]*, -?[0-9]*, -?[0-9]* has the following block data: \[).*?(?<=has the following block data: \[)|\]$", RegexOptions.Compiled);
+                var regex2 = new Regex(@"{([^{}]+|(?<Level>{)|(?<-Level>}))+(?(Level)(?!))}", RegexOptions.Compiled);
+                //var regex3 = new Regex(@",(?![^[]]*\))",RegexOptions.Compiled); <-- This regex wouldn't cooperate
+                String[] SplitOutput = regex.Split(RCON_Output);
+                String[][][] ParsedOutput = new String[SplitOutput.Length - 2][][];
+                for (int i = 0; i < (SplitOutput.Length - 2); i++)
                 {
-                    NBT_Output = stringy.Split(delim2, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (String stringy2 in NBT_Output)
+                    String MatchString = SplitOutput[i + 1];
+                    MatchCollection MatchOutput2 = regex2.Matches(MatchString);
+                    ParsedOutput[i] = new String[MatchOutput2.Count][];
+                    for (int j = 0; j < MatchOutput2.Count; j++)
                     {
-                        if (string.IsNullOrWhiteSpace(stringy2) == false)
+                        String MatchString3 = MatchOutput2[j].ToString();
+                        String[] SplitOutput3 = MatchString3.Split(new[] { ',' }, 4);
+                        //String[] SplitOutput3 = regex3.Split(MatchString3.Substring(1,MatchString3.Length-2));
+                        ParsedOutput[i][j] = new String[SplitOutput3.Length];
+                        for (int k = 0; k < (SplitOutput3.Length); k++)
                         {
-                            if (stringy2.Contains("id:") == true)
-                            {
-                                str.Append(stringy2.Remove(0, 6).TrimEnd('"'));
-                            }
-                            if (stringy2.Contains("Count:") == true)
-                            {
-                                str.Append("~");
-                                temp5 = stringy2.Remove(0, 8).Split(delim4, StringSplitOptions.RemoveEmptyEntries);
-                                str.Append(temp5[0].TrimEnd(delim3));
-                                str.AppendLine();
-                            }
+                            ParsedOutput[i][j][k] = SplitOutput3[k].Trim();
                         }
                     }
                 }
+                StringBuilder str = new StringBuilder();
+                for (int i = 0; i < ParsedOutput.Length; i++)
+                {
+                    for (int j = 0; j < ParsedOutput[i].Length; j++)
+                    {
+                        if (ParsedOutput[i][j].Length == 3)
+                        {
+                            str.Append(ParsedOutput[i][j][1].Remove(0, 5).TrimEnd('"') + "~" + ParsedOutput[i][j][2].Remove(0, 7).TrimEnd('}').TrimEnd('b'));
+                        }
+                        else
+                        {
+                            str.Append(ParsedOutput[i][j][1].Remove(0, 5).TrimEnd('"') + ParsedOutput[i][j][3].Remove(ParsedOutput[i][j][3].Length - 1, 1).Remove(0, 5) + "~" + ParsedOutput[i][j][2].Remove(0, 7).TrimEnd('b'));
+                        }
+                        str.AppendLine();
+                    }
+                }
+                toFactorioString = str.ToString().TrimEnd(Environment.NewLine.ToCharArray());
             }
-            toFactorioString = str.ToString().TrimEnd(Environment.NewLine.ToCharArray());
-            await rcon.SendCommandAsync("/execute at @e[tag=SendChest] run data remove block ~ ~ ~ Items");
+            //await rcon.SendCommandAsync("execute as @e[tag=SendChest] run data modify entity @s ArmorItems[3].tag.ClearItems set value 1");
             List<ItemPair> items = new List<ItemPair>();
             String[] temp7 = toFactorioString.Split(Environment.NewLine.ToCharArray());
             foreach (String stringy3 in temp7)
@@ -373,7 +398,17 @@ namespace Factorio_MC_Bridge
 
 			//Remap Items to the opposing item
 			for (int i = 0; i < items.Count; i++) {
-				items[i].name = mappings.minecraft[items[i].name];
+                try
+                {
+                    items[i].name = mappings.minecraft[items[i].name];
+                }
+				catch (Exception e)
+                {
+                    Console.WriteLine(e.InnerException);
+                    Console.WriteLine("Something went wrong. Moving past error.");
+                    Console.WriteLine(e.Message);
+                    continue;
+                }
 			}
 			return items;
 		}
@@ -408,38 +443,112 @@ namespace Factorio_MC_Bridge
         public static async void sendToVanillaMinecraft(List<ItemPair> items, Settings settings, RCON rcon) {
             if (items.Count > 0)
             {
-                String[] temp = { "" };
-                String RCON_Output = "";
-                String RCON_Output2 = "";
-                String temp4 = "";
-                Boolean FullFlag = false;
-                for (int i = 0; i < items.Count; i++)
+                //if (0==1) //Disabled
+                //{
+                //    String RCON_Output = await rcon.SendCommandAsync("execute as @e[tag=ReceiveChest] at @s store result entity @s ArmorItems[3].tag.ClearItems int 1 run data get block ~ ~ ~ Items");
+                //    ///
+                //    ///This section of regex is mostly trial and error.
+                //    ///It seems to break if too much is thrown at it at once however.
+                //    ///
+                //    var regex = new Regex(@"^.*?(?<=has the following block data: \[)|(?=\]-?[0-9]*, -?[0-9]*, -?[0-9]* has the following block data: \[).*?(?<=has the following block data: \[)|\]$",RegexOptions.Compiled);
+                //    var regex2 = new Regex(@"{([^{}]+|(?<Level>{)|(?<-Level>}))+(?(Level)(?!))}",RegexOptions.Compiled);
+                //    var regex3 = new Regex(@",(?![^[]]*\))",RegexOptions.Compiled);
+                //    String[] SplitOutput = regex.Split(RCON_Output);
+                //    String[][][] ParsedOutput = new String[SplitOutput.Length-2][][];
+                //    for (int i = 0; i < (SplitOutput.Length - 2); i++)
+                //    {
+                //        String MatchString = SplitOutput[i+1];
+                //        MatchCollection MatchOutput2 = regex2.Matches(MatchString);
+                //        ParsedOutput[i] = new String[MatchOutput2.Count][];
+                //        for (int j = 0; j < MatchOutput2.Count; j++)
+                //        {
+                //            String MatchString3 = MatchOutput2[j].ToString();
+                //            String[] SplitOutput3 = regex3.Split(MatchString3.Substring(1,MatchString3.Length-2));
+                //            ParsedOutput[i][j] = new String[SplitOutput3.Length];
+                //            for (int k = 0; k < (SplitOutput3.Length); k++)
+                //            {
+                //                ParsedOutput[i][j][k] = SplitOutput3[k].Trim();
+                //            }
+                //        }
+                //    }
+                //}
+                String[][] InputItems = new String[items.Count][];
+                String[] TempSplit = {""};
+                Char[] Splitter = {'{'};
+                for (int i = 0; i < InputItems.Length; i++)
                 {
-                    temp = items[i].name.Split(':'); //Currently only blocks work. I'm planning on adding loot tables for items later.
-                    for (int j = 0; j < items[i].count; j++)
+                    TempSplit = items[i].name.Split(Splitter,2);
+                    InputItems[i] = new String[3];
+                    InputItems[i][0] = TempSplit[0];
+                    try
                     {
-                        FullFlag = false;
-                        while (!FullFlag)
-                        {
-                            //The new /loot command seems to be the only way to get chests to fill without having to specify each individual slot.
-                            RCON_Output = await rcon.SendCommandAsync("/execute at @e[tag=ReceiveChest,limit=1,sort=arbitrary,tag=!ReceiveFull] run loot insert ~ ~ ~ loot minecraft:blocks/" + temp[1]);
-                            temp4 = RCON_Output.Remove(0, 8);
-                            if (RCON_Output.StartsWith("0")) //This never returns 0 because of what seems to be a bug in 18w45a
-                            {
-                                await rcon.SendCommandAsync("/tag @e[tag=ReceiveChest,limit=1,sort=arbitrary,tag=!RecieveFull] add ReceiveFull");
-                                RCON_Output2 = await rcon.SendCommandAsync("/execute if entity @e[tag=ReceiveChest,limit=1,sort=arbitrary,tag=!ReceiveFull]");
-                                if (RCON_Output2 == "Test failed")
-                                {
-                                    FullFlag = true;
-                                }
-                            } else
-                            {
-                                FullFlag = true;
-                            }
-                        }
-                        FullFlag = false;
+                        InputItems[i][1] = TempSplit[1];
+                    }
+                    catch (Exception)
+                    {
+                        InputItems[i][1] = "";
+                    }
+                    InputItems[i][2] = items[i].count.ToString();
+                }
+                /*
+                    This section will break if more than 27 items are given at once since that maxes out a shulker box.
+                    I'll get around to fixing that soon.
+                    UPDATE: Added code to support multiple chests, but it still doesn't work for some reason.
+                    UPDATE2: Turns out it isn't exactly a problem with my code. It's actually trying to shove too much crap through RCON at once, thus giving it a heart attack.
+                */
+                int ShulkerBoxSize = 9; //I wish this didn't have to be here, but I don't have any better ideas for how to avoid choking RCON.
+                int ShulkerBoxCount = ((InputItems.Length - 1) / ShulkerBoxSize);
+                int ShulkerBoxOverflow = (InputItems.Length % ShulkerBoxSize);
+                String[][] ItemStrings = new String[(ShulkerBoxCount + 1)][];
+                if (ShulkerBoxOverflow != 0)
+                {
+                    for (int i = 0; i < (ItemStrings.Length - 1); i++)
+                    {
+                        ItemStrings[i] = new String[ShulkerBoxSize];
+                    }
+                    ItemStrings[(ItemStrings.Length - 1)] = new String[ShulkerBoxOverflow];
+                }
+                else
+                {
+                    for (int i = 0; i < ItemStrings.Length; i++)
+                    {
+                        ItemStrings[i] = new String[ShulkerBoxSize];
                     }
                 }
+                int ItemIndex = 0;
+                String[] ShulkerBoxStrings = new String[ItemStrings.Length];
+                for (int i = 0; i < ItemStrings.Length; i++)
+                {
+                    ShulkerBoxStrings[i] = "[";
+                    for (int j = 0; j < ItemStrings[i].Length; j++)
+                    {
+                        ItemIndex = ((ShulkerBoxSize * i) + j);
+                        if (InputItems[ItemIndex][1] != "")
+                        {
+                            ItemStrings[i][j] = "{Slot:"+j+"b,id:\""+InputItems[ItemIndex][0]+"\",Count:"+InputItems[ItemIndex][2]+"b,tag:{"+InputItems[ItemIndex][1]+"}";
+                        }
+                        else
+                        {
+                            ItemStrings[i][j] = "{Slot:"+j+"b,id:\""+InputItems[ItemIndex][0]+"\",Count:"+InputItems[ItemIndex][2]+"b}";
+                        }
+                        ShulkerBoxStrings[i] += ItemStrings[i][j];
+                        if (j != (ItemStrings[i].Length - 1))
+                        {
+                            ShulkerBoxStrings[i] += ",";
+                        }
+                    }
+                    ShulkerBoxStrings[i] += "]";
+                }
+                //String Command = "";
+                String RCON_Output2 = "";
+                for (int i = 0; i < ShulkerBoxStrings.Length; i++)
+                {
+                    //RCON_Output2 = await rcon.SendCommandAsync("execute as @e[tag=ReceiveChest,tag=!ReceiveFull,limit=1,sort=arbitrary,nbt={ArmorItems:[{tag:{CollectItems:0}}]}] run say hi");
+                    //Command = "execute as @e[tag=ReceiveChest,tag=!ReceiveFull,limit=1,sort=arbitrary,nbt={ArmorItems:[{tag:{CollectItems:0}}]}] store result entity @s ArmorItems[3].tag.CollectItems int 1 at @s run setblock ~ 0 ~ minecraft:shulker_box{Items:"+ShulkerBoxStrings[i]+"}";
+                    RCON_Output2 = await rcon.SendCommandAsync("execute as @e[tag=ReceiveChest,tag=!ReceiveFull,limit=1,sort=arbitrary,nbt={ArmorItems:[{tag:{CollectItems:0}}]}] store result entity @s ArmorItems[3].tag.CollectItems int 1 at @s run setblock ~ 0 ~ minecraft:shulker_box{Items:" + ShulkerBoxStrings[i] + "}");
+                    //Console.WriteLine(Command);
+                }
+                return;
             }
 		}
 

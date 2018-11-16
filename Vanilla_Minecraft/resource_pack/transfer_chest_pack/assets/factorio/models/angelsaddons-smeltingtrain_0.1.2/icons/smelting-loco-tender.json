@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:angelsaddons-smeltingtrain_0.1.2/icons/smelting-loco-tender"
+    }
+}

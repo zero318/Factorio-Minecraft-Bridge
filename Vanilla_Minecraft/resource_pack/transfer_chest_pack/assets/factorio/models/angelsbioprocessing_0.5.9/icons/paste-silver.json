@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:angelsbioprocessing_0.5.9/icons/paste-silver"
+    }
+}

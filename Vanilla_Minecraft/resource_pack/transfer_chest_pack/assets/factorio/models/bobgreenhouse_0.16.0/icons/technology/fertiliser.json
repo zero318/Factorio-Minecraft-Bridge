@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:bobgreenhouse_0.16.0/icons/technology/fertiliser"
+    }
+}

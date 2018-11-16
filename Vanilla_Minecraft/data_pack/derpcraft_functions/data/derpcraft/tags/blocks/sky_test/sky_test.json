@@ -1,0 +1,33 @@
+{
+  "replace": false,
+  "values": [
+    "#derpcraft:all/airs",
+    "#derpcraft:all/fences",
+    "#derpcraft:all/fluids",
+    "#derpcraft:all/fragile_redstone",
+    "#derpcraft:all/glass",
+    "#derpcraft:all/plants",
+    "#derpcraft:all/signs",
+    "#derpcraft:all/skulls",
+    "#derpcraft:all/walls",
+    "#minecraft:corals",
+    "#minecraft:coral_blocks",
+    "#minecraft:doors",
+    "#minecraft:banners",
+    "#minecraft:flower_pots",
+    "#minecraft:rails",
+    "minecraft:bubble_column",
+    "minecraft:conduit",
+    "minecraft:piston_head",
+    "minecraft:ladder",
+    "minecraft:moving_piston",
+    "minecraft:end_rod",
+    "minecraft:structure_void",
+    "minecraft:torch",
+    "minecraft:fire",
+    "minecraft:ice",
+    "minecraft:cobweb",
+    "minecraft:barrier",
+    "minecraft:iron_bars"
+  ]
+}

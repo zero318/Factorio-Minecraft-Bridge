@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:bobplates_0.16.5/icons/powdered-silicon"
+    }
+}

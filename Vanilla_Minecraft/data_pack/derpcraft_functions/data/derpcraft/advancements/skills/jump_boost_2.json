@@ -1,0 +1,29 @@
+{
+  "parent": "derpcraft:skills/jump_boost_1",
+  "display": {
+    "icon": {
+      "item": "minecraft:rabbit_foot"
+    },
+    "title": {
+      "text": "Permanent Jump Boost II"
+    },
+    "description": {
+      "text": "Constant Effect"
+    },
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "example": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "derpcraft:skills/jump_boost_2"
+      }
+    }
+  },
+  "rewards": {
+    "function": "derpcraft:skills/jump_boost_2"
+  }
+}

@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:angelsaddons-petrotrain_0.3.3/technology/petro-loco-1-tech"
+    }
+}

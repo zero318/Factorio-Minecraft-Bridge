@@ -1,0 +1,1 @@
+replaceitem entity @s armor.chest minecraft:air

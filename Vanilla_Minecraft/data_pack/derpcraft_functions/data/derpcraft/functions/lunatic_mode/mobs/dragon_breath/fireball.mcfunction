@@ -1,0 +1,11 @@
+summon minecraft:area_effect_cloud ~ ~2.5 ~ {Duration:600,Particle:"minecraft:dragon_breath",WaitTime:20,Effects:[{Duration:1,Id:7,Amplifier:1}],Air:300s,Fire:-1s,Tags:["LunaticMode"],Radius:0.7421875,RadiusPerTick:0.000833333}
+summon minecraft:area_effect_cloud ~ ~2 ~ {Duration:600,Particle:"minecraft:dragon_breath",WaitTime:20,Effects:[{Duration:1,Id:7,Amplifier:1}],Air:300s,Fire:-1s,Tags:["LunaticMode"],Radius:1.359375,RadiusPerTick:0.001666666}
+summon minecraft:area_effect_cloud ~ ~1.5 ~ {Duration:600,Particle:"minecraft:dragon_breath",WaitTime:20,Effects:[{Duration:1,Id:7,Amplifier:1}],Air:300s,Fire:-1s,Tags:["LunaticMode"],Radius:1.96875,RadiusPerTick:0.003333333}
+summon minecraft:area_effect_cloud ~ ~1 ~ {Duration:600,Particle:"minecraft:dragon_breath",WaitTime:20,Effects:[{Duration:1,Id:7,Amplifier:1}],Air:300s,Fire:-1s,Tags:["LunaticMode"],Radius:2.4375,RadiusPerTick:0.005}
+summon minecraft:area_effect_cloud ~ ~0.5 ~ {Duration:600,Particle:"minecraft:dragon_breath",WaitTime:20,Effects:[{Duration:1,Id:7,Amplifier:1}],Air:300s,Fire:-1s,Tags:["LunaticMode"],Radius:2.75,RadiusPerTick:0.006}
+summon minecraft:area_effect_cloud ~ ~-0.5 ~ {Duration:600,Particle:"minecraft:dragon_breath",WaitTime:20,Effects:[{Duration:1,Id:7,Amplifier:1}],Air:300s,Fire:-1s,Tags:["LunaticMode"],Radius:2.75,RadiusPerTick:0.006}
+summon minecraft:area_effect_cloud ~ ~-1 ~ {Duration:600,Particle:"minecraft:dragon_breath",WaitTime:20,Effects:[{Duration:1,Id:7,Amplifier:1}],Air:300s,Fire:-1s,Tags:["LunaticMode"],Radius:2.4375,RadiusPerTick:0.005}
+summon minecraft:area_effect_cloud ~ ~-1.5 ~ {Duration:600,Particle:"minecraft:dragon_breath",WaitTime:20,Effects:[{Duration:1,Id:7,Amplifier:1}],Air:300s,Fire:-1s,Tags:["LunaticMode"],Radius:1.96875,RadiusPerTick:0.003333333}
+summon minecraft:area_effect_cloud ~ ~-2 ~ {Duration:600,Particle:"minecraft:dragon_breath",WaitTime:20,Effects:[{Duration:1,Id:7,Amplifier:1}],Air:300s,Fire:-1s,Tags:["LunaticMode"],Radius:1.359375,RadiusPerTick:0.001666666}
+summon minecraft:area_effect_cloud ~ ~-2.5 ~ {Duration:600,Particle:"minecraft:dragon_breath",WaitTime:20,Effects:[{Duration:1,Id:7,Amplifier:1}],Air:300s,Fire:-1s,Tags:["LunaticMode"],Radius:0.7421875,RadiusPerTick:0.000833333}
+tag @s add LunaticMode

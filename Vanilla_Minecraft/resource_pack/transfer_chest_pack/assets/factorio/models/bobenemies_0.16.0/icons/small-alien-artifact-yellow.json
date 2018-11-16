@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:bobenemies_0.16.0/icons/small-alien-artifact-yellow"
+    }
+}

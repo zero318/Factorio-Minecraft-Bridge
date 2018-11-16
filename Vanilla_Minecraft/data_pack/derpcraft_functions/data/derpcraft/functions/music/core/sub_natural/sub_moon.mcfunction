@@ -1,0 +1,2 @@
+execute unless score Moon DerpcraftData matches 4 as @a[tag=OpenSky,tag=!WaterMusic] run function derpcraft:music/play/natural_music/night
+execute if score Moon DerpcraftData matches 4 as @a[tag=OpenSky,tag=!WaterMusic] run function derpcraft:music/play/natural_music/new_moon

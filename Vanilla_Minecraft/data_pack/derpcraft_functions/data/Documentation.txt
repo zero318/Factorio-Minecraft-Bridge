@@ -1,0 +1,86 @@
+DERPCRAFT DATAPACK
+
+
+-Intro:
+
+So, you decided to pop open my datapack?
+Well congratulations, you're probably the first one to do so. ;_;
+
+Anyway, this text file is supposed to describe what this datapack does and how it does it. It won't go into excessive detail since that'd be a page of text for every function or something stupid, but it'll at least try to point you in the right direction so you can understand it.
+
+
+-Basics:
+
+The first thing to understand is that there are two namespaces within this datapack: "minecraft" and "derpcraft". The idea behind a namespace is that it lets multiple variables/functions/etc exist with the same name. For example, there can be a function "minecraft:example_function" and a function "derpcraft:example_function". It would've been easy to just use the minecraft namespace for everything, but then any other datapacks that use the minecraft namespace could end up competeing for the same names. To avoid this, I moved as many things as possible to my own namespace, which is far less likely to have issues than the default.
+
+However, there're a few special things in the "minecraft" namespace that were required to make the datapack run. The function tags "load" and "tick" allow functions listed in them to be run automatically.
+
+Anything listed in "minecraft:load" will be run whenever the world loads or the /reload command is run.
+
+Anything listed in "minecraft:tick" will be run every game tick, which is 20 times per second assuming there's no lag.
+
+Personally, I redirected those tags to my own tags in the derpcraft namespace ("derpcraft:load" and "derpcraft:tick") which do the same thing.
+
+Everything about a datapack runs in a specific order. When the world loads, any functions listed in "derpcraft:load" will run before any functions listed in "derpcraft:tick". Looking inside "derpcraft:load", any functions listed in "derpcraft:reload" will run before anything in "derpcraft:music/core/reload". And even within a function itself, the commands will run in the order listed. If one of the commands happens to be a function as well, the contents of that function will be run before the next command.
+
+Because of this, it's possible to determine the exact order that every command in this datapack will execute in. Without knowing the order of execution, it would be extremely difficult (if not impossible) to understand why certain things run the way they do.
+
+
+-Structure of the Datapack:
+
+Most of the interesting things about this datapack are contained in the functions folder. Inside, you'll find a bunch of other folders which have been named after what the functions inside of them do. Generally speaking, the contents of each folder follow a particular naming pattern:
+
+initialize
+-This function runs from the load tag only once when the world is first loaded.
+
+reload
+-This function runs from the load tag every time the tag is run.
+
+main
+-This function runs from the tick tag and is where execution starts within the folder.
+
+sub_
+-These functions are subroutines that can be called from within the main function.
+
+
+-Lag Reduction:
+
+Generally speaking, Minecraft is not very fast. It's really easy to bog it down by running too many commands at once. However, this datapack manages to run hundreds if not thousands of  commands per second. How does it do it? By not actually running things unless it has to. XD
+
+The music function is a great example. There are over 200 different tracks that can be played, each of which needs one command to play the sound and another command to set the timer for when it should loop. The function *could* be coded to run through all of those every tick. After all, each of those 400 commands contains a check to make sure that it only plays for the correct players. However, that would still mean that Minecraft is checking 400 things EVERY 1/20th of a second. To avoid causing unnecessary lag, the commands that play the sounds have been split off into a separate function that only runs once a player's timer has ticked to zero. Instead of running 400 commands every tick for no reason, it only runs a single command every tick that checks whether the full 400 should be run. This ends up running them every couple thousand ticks, which generates a lot less lag.
+
+Similar techniques have been used to try to reduce the amount of commands run wherever possible.
+
+
+-How Many Commands Actually Run:
+
+The other confusing thing is following how commands run when branched off into another function.
+
+For example, let's say there's a function called "derpcraft:example" that contains 20 commands. There are 3 players (PlayerA, PlayerB, and PlayerC) in the world and 12 other entities.
+
+If you run the command "function derpcraft:example" it will run the 20 commands as if they had been typed into the server console. This means that all the commands inside of it will have to use @a or @e since @s would target the console and not do anything.
+
+However, the command "execute as @a run function derpcraft:example" has a very different effect. Instead of running the 20 commands as the console, it will run all 20 commands once as each player, thus running 20 commands PER player. Since there are 3 players in this example, that means it would run 60 commands instead of 20. However, this has the benefit of running the commands for each player separately. All 20 commands for PlayerA will run before any of the commands for PlayerB or PlayerC have been run. In addition, @s can be used to target each player as they run the commands. So @s will target *only* PlayerA for the commands run by PlayerA, even though the function is being run by all three players. This can be used to make many systems more multiplayer compatible since it allows calculating each player one at a time instead of trying interpret all the data at once, which is frequently not possible. To reduce lag, this type of command is generally run so that it will only apply to relevant players. Unless multiple players do the same exact action within a single tick, it will still only run 20 commands.
+
+
+-Notes About Troubleshooting
+
+In case anyone didn't know, functions are a little bit different than chat commands and command block commands. The biggest difference is that they aren't allowed to start with a /. Even a single / will completely break the function and Minecraft won't recognize it. Fortunately Minecraft will tell you in the output log exactly what went wrong with a giant red box, so you can figure out what you did dumb. Here's an example of an error and how to read it:
+
+Couldn't load function at derpcraft:functions/villages/main.mcfunction
+java.util.concurrent.CompletionException: java.lang.IllegalArgumentException: Whilst parsing command on line 1: Incorrect argument for command at position 8: execute <--[HERE]
+
+Looking at that, it says "derpcraft:functions/villages/main.mcfunction", so we immediately know that's what function had the problem.
+
+It also says that the error was on line 1. Minecraft counts lines starting from 0, so that means the error was on the second command in the function.
+
+Finally is says the error was at position 8, which means that the error occured that many characters into the command. The simple way to get to that position is to put your cursor at the beginning of the line and then just hit the right arrow key 8 times.
+
+Fortunately you can ignore the rest of the crap in the red box. It doesn't say anything related to how to fix our function and is only useful to help Mojang fix Minecraft if it turns out there wasn't actually an error in the function and it should've worked.
+
+The other special function syntax is #. Starting a line with # marks it as a comment, which won't be executed. I've tried to use comments to label what parts of a function do, but I haven't done that for everything.
+
+
+-End
+
+In general, if you have no idea what this documentation said, don't worry too much about it. Just go pop open the function tags "derpcraft:load" and "derpcraft:tick" to see what functions are listed inside, then go see if you can follow how it does things.

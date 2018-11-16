@@ -1,0 +1,6 @@
+{
+    "parent": "item/generated",
+    "textures": {
+        "layer0": "factorio:buffer-warehouse_0.2.0/icons/warehouse-buffer"
+    }
+}

@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "#derpcraft:all/pressure_plates",
+    "#derpcraft:all/tripwires",
+    "#minecraft:buttons",
+    "minecraft:redstone_wire",
+    "minecraft:redstone_torch",
+    "minecraft:repeater",
+    "minecraft:comparator",
+    "minecraft:lever"
+  ]
+}

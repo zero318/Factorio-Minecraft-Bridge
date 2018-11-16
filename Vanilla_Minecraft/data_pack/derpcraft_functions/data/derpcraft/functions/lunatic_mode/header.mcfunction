@@ -1,0 +1,1 @@
+execute if score LunaticMode DerpcraftData matches 1 run function derpcraft:lunatic_mode/main

@@ -1,0 +1,1 @@
+function derpcraft:tests/cow_test_2
