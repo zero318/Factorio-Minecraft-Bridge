@@ -1,3 +1,0 @@
-execute as @a[advancements={derpcraft:selectors/village={village=true}}] at @s if entity @e[type=minecraft:villager,distance=..100,nbt={Profession:5},tag=!CustomTrades] as @e[type=minecraft:villager,distance=..100,nbt={Profession:5},tag=!CustomTrades] run function derpcraft:villages/sub_custom_nitwits
-execute as @a[advancements={derpcraft:selectors/village={village=true}}] at @s if entity @e[type=minecraft:villager,distance=..100,tag=!NamedVillager] as @e[type=minecraft:villager,distance=..100,tag=!NamedVillager] run function derpcraft:villages/sub_name_villagers
-advancement revoke @a only derpcraft:selectors/village

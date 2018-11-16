@@ -1,1 +1,0 @@
-replaceitem entity @s armor.head minecraft:air

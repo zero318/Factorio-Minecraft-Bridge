@@ -1,1 +1,0 @@
-function derpcraft:items/portal_gun/give

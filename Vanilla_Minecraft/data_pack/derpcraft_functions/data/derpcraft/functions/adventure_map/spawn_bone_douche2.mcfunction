@@ -1,1 +1,0 @@
-execute if entity @e[distance=..20,tag=BoneDouche2] run tag @s remove SpawnNew

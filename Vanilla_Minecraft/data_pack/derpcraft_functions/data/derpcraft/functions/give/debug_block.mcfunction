@@ -1,1 +1,0 @@
-give @s minecraft:chainmail_boots{Damage:1,Unbreakable:1,display:{Name:"{\"text\":\"Debug Block\",\"italic\":false}"},HideFlags:6,CustomBlock:1}

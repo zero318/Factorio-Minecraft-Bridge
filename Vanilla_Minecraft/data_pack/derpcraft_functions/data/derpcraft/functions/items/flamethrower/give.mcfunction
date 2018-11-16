@@ -1,2 +1,0 @@
-give @s minecraft:carrot_on_a_stick{display:{Name:"{\"text\":\"Flamethrower\",\"color\":\"dark_red\",\"italic\":false}",Lore:["Uses Flamethrower Ammo"]},Unbreakable:1,HideFlags:4,Damage:26}
-scoreboard players set @s FlamethrowerAmmo 0

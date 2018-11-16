@@ -1,2 +1,0 @@
-data merge entity @s {Attributes:[{Base:16.0d,Name:"generic.maxHealth"},{Base:0.35d,Name:"generic.movementSpeed"},{Base:20.0d,Name:"generic.followRange"},{Base:3.0d,Name:"generic.attackDamage"}],Health:16.0f}
-tag @s add LunaticMode

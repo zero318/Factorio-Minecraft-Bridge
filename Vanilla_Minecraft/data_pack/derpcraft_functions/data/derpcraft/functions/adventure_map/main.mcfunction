@@ -1,3 +1,0 @@
-function derpcraft:adventure_map/poison_water
-function derpcraft:adventure_map/spider_boss
-function derpcraft:adventure_map/respawn/main

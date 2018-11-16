@@ -1,2 +1,0 @@
-execute if entity @a[nbt={Inventory:[{Slot:100b,id:"minecraft:chainmail_boots",tag:{Damage:1,Unbreakable:1,display:{Name:"{\"text\":\"Debug Block\",\"italic\":false}"},HideFlags:6,CustomBlock:1}}]}] as @a[nbt={Inventory:[{Slot:100b,id:"minecraft:chainmail_boots",tag:{Damage:1,Unbreakable:1,display:{Name:"{\"text\":\"Debug Block\",\"italic\":false}"},HideFlags:6,CustomBlock:1}}]}] run function derpcraft:blocks/place/debug_block
-replaceitem entity @s armor.feet minecraft:air
