@@ -13,10 +13,15 @@ namespace Factorio_MC_Bridge {
         public String mcIpAddress = "";
         public int mcPortNumber = 0;
         public String mcRconPass = "";
+        public String mcServerJava = "";
+        public String mcServerParams = "";
+        public String mcServerDirectory = "";
 		public String factorioPath = "";
 		public String factorioIpAddress = "";
 		public int factorioPortNumber = 0;
 		public String factorioRconPass = "";
+        public String factorioServerPath = "";
+        public String factorioServerParams = "";
 
 		public Settings() {
 		}
@@ -36,7 +41,8 @@ namespace Factorio_MC_Bridge {
             return experimentalIO;
         }
 
-        public String getMcPath() {
+        public String getMcPath()
+        {
 			return mcPath;
 		}
 
@@ -55,21 +61,50 @@ namespace Factorio_MC_Bridge {
             return mcRconPass;
         }
 
-        public String getFactorioPath() {
+        public String getMcServerJava()
+        {
+            return mcServerJava;
+        }
+
+        public String getMcServerParams()
+        {
+            return mcServerParams;
+        }
+
+        public String getMcServerDirectory()
+        {
+            return mcServerDirectory;
+        }
+
+        public String getFactorioPath()
+        {
 			return factorioPath;
 		}
 
-		public String getFactorioIPAddress() {
+		public String getFactorioIPAddress()
+        {
 			return factorioIpAddress;
 		}
 
-		public int getFactorioPort() {
+		public int getFactorioPort()
+        {
 			return factorioPortNumber;
 		}
 
-		public String getFactorioRconPass() {
+		public String getFactorioRconPass()
+        {
 			return factorioRconPass;
 		}
+
+        public String getFactorioServerPath()
+        {
+            return factorioServerPath;
+        }
+
+        public String getFactorioServerParams()
+        {
+            return factorioServerParams;
+        }
 
 
         public void setItemMappingsFile(String s)
@@ -84,7 +119,8 @@ namespace Factorio_MC_Bridge {
         {
             experimentalIO = b;
         }
-        public void setMcPath(String s) {
+        public void setMcPath(String s)
+        {
 			mcPath = s;
 		}
         public void setMcIpAddress(String s)
@@ -99,17 +135,41 @@ namespace Factorio_MC_Bridge {
         {
             mcRconPass = s;
         }
-        public void setFacotrioPath(String s) {
+        public void setMcServerJava(String s)
+        {
+            mcServerJava = s;
+        }
+        public void setMcServerParams(String s)
+        {
+            mcServerParams = s;
+        }
+        public void setMcServerDirectory(String s)
+        {
+            mcServerDirectory = s;
+        }
+        public void setFacotrioPath(String s)
+        {
 			factorioPath = s;
 		}
-		public void setFactorioIpAddress(String s) {
+		public void setFactorioIpAddress(String s)
+        {
 			factorioIpAddress = s;
 		}
-		public void setFactorioPort(int x) {
+		public void setFactorioPort(int x)
+        {
 			factorioPortNumber = x;
 		}
-		public void setFactorioRconPass(String s) {
+		public void setFactorioRconPass(String s)
+        {
 			factorioRconPass = s;
 		}
-	}
+        public void setFactorioServerPath(String s)
+        {
+            factorioServerPath = s;
+        }
+        public void setFactorioServerParams(String s)
+        {
+            factorioServerParams = s;
+        }
+    }
 }

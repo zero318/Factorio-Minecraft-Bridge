@@ -44,40 +44,139 @@ namespace Factorio_MC_Bridge
 			*/
             Console.ForegroundColor = ConsoleColor.Cyan;
             BridgeConsoleWriteLine("Starting Up!");
-			BridgeConsoleWriteLine("To change settings, enter 1, otherwise press any key other to continue.");
+			BridgeConsoleWriteLine("To change settings, enter 1, otherwise press any key other to continue");
 			string choice = Console.ReadLine();
 			Settings settings = new Settings();
 			string startupDoc = Path.Combine(Environment.CurrentDirectory, "settings.json");
             //if (!File.Exists(startupDoc))
             if (!File.Exists(startupDoc) || choice.Equals("1"))
             {
+                FileStream fs1 = new FileStream(startupDoc, FileMode.OpenOrCreate, FileAccess.Read, FileShare.ReadWrite);
+                StreamReader sr = new StreamReader(fs1, Encoding.Default);
+                //
+                string input = "";
+                while (!sr.EndOfStream)
+                {
+                    input += sr.ReadLine();
+                }
+                settings = JsonConvert.DeserializeObject<Settings>(input);
+                sr.Close();
+                fs1.Close();
                 FileStream fs = new FileStream(startupDoc, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
-				StreamWriter sw = new StreamWriter(fs, Encoding.Default);
-                BridgeConsoleWriteLine("Please enter the item mappings file name (default \"item_mappings.txt\"");
-                settings.setItemMappingsFile(Console.ReadLine());
+                //
+                String TempInput = "";
+                BridgeConsoleWriteLine("To leave a setting unchanged from the previous value, just hit enter without typing anything.");
+                BridgeConsoleWriteLine("Please enter the item mappings file name (default \"item_mappings.txt\")");
+                TempInput = Console.ReadLine();
+                if (TempInput != "")
+                {
+                    settings.setItemMappingsFile(TempInput);
+                }
                 BridgeConsoleWriteLine("Please enter Minecraft Type (0=Forge,1=Vanilla 18w46a): ");
-                settings.setMcType(Int32.Parse(Console.ReadLine()));
+                TempInput = Console.ReadLine();
+                if (TempInput != "")
+                {
+                    settings.setMcType(Int32.Parse(TempInput));
+                }
                 BridgeConsoleWriteLine("Use experimental IO? (true/false): ");
-                settings.setExperimentalIO(bool.Parse(Console.ReadLine()));
+                TempInput = Console.ReadLine();
+                if (TempInput != "")
+                {
+                    settings.setExperimentalIO(bool.Parse(TempInput));
+                }
                 BridgeConsoleWriteLine("Please enter Minecraft Location (Root of the Directory): ");
-				settings.setMcPath(Console.ReadLine());
-                BridgeConsoleWriteLine("Please enter the IP Address of the Minecraft Server (only necessary for vanilla): ");
-                settings.setMcIpAddress(Console.ReadLine());
-                BridgeConsoleWriteLine("Please enter Minecraft RCON Port Number (only necessary for vanilla): ");
-                settings.setMcPort(Int32.Parse(Console.ReadLine()));
-                BridgeConsoleWriteLine("Please enter Minecraft RCON password (only necessary for vanilla): ");
-                settings.setMcRconPass(Console.ReadLine());
-                BridgeConsoleWriteLine("Please enter Factorio Server Path (Root of the Directory): ");
-				settings.setFacotrioPath(Console.ReadLine());
+                TempInput = Console.ReadLine();
+                if (TempInput != "")
+                {
+                    settings.setMcPath(TempInput);
+                }
+                if (settings.getMcType() != 0)
+                {
+                    BridgeConsoleWriteLine("Please enter the IP Address of the Minecraft Server: ");
+                    TempInput = Console.ReadLine();
+                    if (TempInput != "")
+                    {
+                        settings.setMcIpAddress(TempInput);
+                    }
+                    BridgeConsoleWriteLine("Please enter Minecraft RCON Port Number: ");
+                    TempInput = Console.ReadLine();
+                    if (TempInput != "")
+                    {
+                        settings.setMcPort(Int32.Parse(TempInput));
+                    }
+                    BridgeConsoleWriteLine("Please enter Minecraft RCON password: ");
+                    TempInput = Console.ReadLine();
+                    if (TempInput != "")
+                    {
+                        settings.setMcRconPass(TempInput);
+                    }
+                    if (settings.getExperimentalIO() == true)
+                    {
+                        BridgeConsoleWriteLine("Please enter the Java to run the Minecraft server with (likely just \"java\" will work):");
+                        TempInput = Console.ReadLine();
+                        if (TempInput != "")
+                        {
+                            settings.setMcServerJava(TempInput);
+                        }
+                        BridgeConsoleWriteLine("Please enter Minecraft server location:");
+                        TempInput = Console.ReadLine();
+                        if (TempInput != "")
+                        {
+                            settings.setMcServerDirectory(TempInput);
+                        }
+                        BridgeConsoleWriteLine("Please enter Minecraft server parameters:");
+                        TempInput = Console.ReadLine();
+                        if (TempInput != "")
+                        {
+                            settings.setMcServerParams(TempInput);
+                        }
+                    }
+                }
+                BridgeConsoleWriteLine("Please enter Factorio Data Path (Root of the Directory): ");
+                TempInput = Console.ReadLine();
+                if (TempInput != "")
+                {
+                    settings.setFacotrioPath(TempInput);
+                }
 				BridgeConsoleWriteLine("Please enter the IP Address of the Factorio Server: ");
-				settings.setFactorioIpAddress(Console.ReadLine());
+                TempInput = Console.ReadLine();
+                if (TempInput != "")
+                {
+                    settings.setFactorioIpAddress(TempInput);
+                }
 				BridgeConsoleWriteLine("Please enter Factorio RCON Port Number: ");
-				settings.setFactorioPort(Int32.Parse(Console.ReadLine()));
+                TempInput = Console.ReadLine();
+                if (TempInput != "")
+                {
+                    settings.setFactorioPort(Int32.Parse(TempInput));
+                }
 				BridgeConsoleWriteLine("Please enter Factorio RCON password: ");
-				settings.setFactorioRconPass(Console.ReadLine());
+                TempInput = Console.ReadLine();
+                if (TempInput != "")
+                {
+                    settings.setFactorioRconPass(TempInput);
+                }
+                if (settings.getExperimentalIO() == true)
+                {
+                    BridgeConsoleWriteLine("Please enter path to Factorio server:");
+                    TempInput = Console.ReadLine();
+                    if (TempInput != "")
+                    {
+                        settings.setFactorioServerPath(TempInput);
+                    }
+                    BridgeConsoleWriteLine("Please enter Factorio server parameters:");
+                    TempInput = Console.ReadLine();
+                    if (TempInput != "")
+                    {
+                        settings.setFactorioServerParams(TempInput);
+                    }
+                }
 				string output = JsonConvert.SerializeObject(settings);
-				sw.WriteLine(output);
+                //File.WriteAllText("settings.json", string.Empty); //This line prevents duplicating the settings.
+                StreamWriter sw = new StreamWriter(fs, Encoding.Default);
+                sw.WriteLine(output);
 				sw.Close();
+                //sr.Close();
 			}
 			else
 			{
@@ -152,6 +251,14 @@ namespace Factorio_MC_Bridge
             }
             else
             {
+                /*
+                    Since all three programs run in the same window, each is color coded and labelled to make it legible:
+                    Bridge: Cyan
+                    Factorio: Red
+                    Minecraft: Green
+
+                    I'm planning on adding an option to change the colors later.
+                */
                 if (settings.getExperimentalIO() == true)
                 {
                     BridgeConsoleWriteLine("Found settings.");
@@ -160,10 +267,10 @@ namespace Factorio_MC_Bridge
                     /*
                         These two lines are the parameters for the Factorio server
                     */
-                    FactorioServer.StartInfo.FileName = "F:\\SteamLibrary\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe";
-                    FactorioServer.StartInfo.Arguments = "--start-server C:\\Users\\zero318\\AppData\\Roaming\\Factorio\\saves\\Minecraft_Bridge_Tests\\Minecraft_Bridge_Test_1 --bind 127.0.0.1:30000 --rcon-port 25525 --rcon-password test --no-log-rotation";
+                    FactorioServer.StartInfo.FileName = settings.getFactorioServerPath();
+                    FactorioServer.StartInfo.Arguments = settings.getFactorioServerParams();
                     FactorioServer.StartInfo.CreateNoWindow = false;
-                    FactorioServer.StartInfo.WorkingDirectory = "C:\\Users\\zero318\\My Minecraft\\Local Server";
+                    FactorioServer.StartInfo.WorkingDirectory = settings.getMcServerDirectory();
                     FactorioServer.StartInfo.ErrorDialog = false;
                     FactorioServer.StartInfo.UseShellExecute = false;
                     FactorioServer.StartInfo.RedirectStandardError = true;
@@ -209,10 +316,10 @@ namespace Factorio_MC_Bridge
                     /*
                         These two lines are the parameters for the Minecraft server
                     */
-                    MinecraftServer.StartInfo.FileName = "java";
-                    MinecraftServer.StartInfo.Arguments = "-d64 -server -XX:+UseConcMarkSweepGC -XX:+DisableExplicitGC -XX:+UseAdaptiveGCBoundary -XX:MaxGCPauseMillis=500 -XX:-UseGCOverheadLimit -XX:SurvivorRatio=12 -XX:NewRatio=4 -Xnoclassgc -XX:UseSSE=3 -Xmx2G -Xms1G -jar \"C:\\Users\\zero318\\My Minecraft\\Local Server\\minecraft_server.18w46a.jar\" nogui";
+                    MinecraftServer.StartInfo.FileName = settings.getMcServerJava();
+                    MinecraftServer.StartInfo.Arguments = settings.getMcServerParams();
                     MinecraftServer.StartInfo.CreateNoWindow = false;
-                    MinecraftServer.StartInfo.WorkingDirectory = "C:\\Users\\zero318\\My Minecraft\\Local Server";
+                    MinecraftServer.StartInfo.WorkingDirectory = settings.getMcServerDirectory();
                     MinecraftServer.StartInfo.ErrorDialog = false;
                     MinecraftServer.StartInfo.UseShellExecute = false;
                     MinecraftServer.StartInfo.RedirectStandardError = true;
