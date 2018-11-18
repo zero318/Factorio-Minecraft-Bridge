@@ -24,17 +24,17 @@ namespace Factorio_MC_Bridge
             /*
                 I'm really not sure whether the servers close properly when the bridge closes,
                 so these lines are here to make sure nothing weird happens.
-            */ 
+            */
             String Previous_Factorio_Server_PID = File.ReadAllText("Factorio_Server_PID.txt");
             String Previous_Minecraft_Server_PID = File.ReadAllText("Minecraft_Server_PID.txt");
             if (Previous_Factorio_Server_PID != "")
             {
-                KillPreviousServer(Int32.Parse(Previous_Factorio_Server_PID));
+                KillPreviousServer(Int32.Parse(Previous_Factorio_Server_PID), "Factorio");
                 File.WriteAllText("Factorio_Server_PID.txt", string.Empty);
             }
             if (Previous_Minecraft_Server_PID != "")
             {
-                KillPreviousServer(Int32.Parse(Previous_Minecraft_Server_PID));
+                KillPreviousServer(Int32.Parse(Previous_Minecraft_Server_PID), "Minecraft");
                 File.WriteAllText("Minecraft_Server_PID.txt", string.Empty);
             }
 
@@ -48,7 +48,6 @@ namespace Factorio_MC_Bridge
 			string choice = Console.ReadLine();
 			Settings settings = new Settings();
 			string startupDoc = Path.Combine(Environment.CurrentDirectory, "settings.json");
-            //if (!File.Exists(startupDoc))
             if (!File.Exists(startupDoc) || choice.Equals("1"))
             {
                 FileStream fs1 = new FileStream(startupDoc, FileMode.OpenOrCreate, FileAccess.Read, FileShare.ReadWrite);
@@ -172,7 +171,6 @@ namespace Factorio_MC_Bridge
                     }
                 }
 				string output = JsonConvert.SerializeObject(settings);
-                //File.WriteAllText("settings.json", string.Empty); //This line prevents duplicating the settings.
                 StreamWriter sw = new StreamWriter(fs, Encoding.Default);
                 sw.WriteLine(output);
 				sw.Close();
@@ -243,8 +241,7 @@ namespace Factorio_MC_Bridge
                     }
                     catch (Exception e)
                     {
-                        BridgeConsoleWriteLine("Something went wrong. Moving past error.");
-                        BridgeConsoleWriteLine(e.Message);
+                        PrintErrorInfo(e);
                         continue;
                     }
                 }
@@ -275,7 +272,7 @@ namespace Factorio_MC_Bridge
                     FactorioServer.StartInfo.UseShellExecute = false;
                     FactorioServer.StartInfo.RedirectStandardError = true;
                     FactorioServer.StartInfo.RedirectStandardOutput = true;
-                    FactorioServer.StartInfo.RedirectStandardInput = true;
+                    //FactorioServer.StartInfo.RedirectStandardInput = true;
                     String FactorioServerLog = "";
                     FactorioServer.OutputDataReceived += new DataReceivedEventHandler
                     (
@@ -296,7 +293,8 @@ namespace Factorio_MC_Bridge
                         }
                     );
                     FactorioServer.Start();
-                    StreamWriter FactorioInputWriter = FactorioServer.StandardInput;
+                    //Stream FactorioInputStream = FactorioServer.StandardInput.
+                    //StreamWriter FactorioInputWriter = FactorioServer.StandardInput;
                     FactorioServer.BeginOutputReadLine();
                     FactorioServer.BeginErrorReadLine();
                     File.WriteAllText("Factorio_Server_PID.txt", FactorioServer.Id.ToString());
@@ -310,7 +308,6 @@ namespace Factorio_MC_Bridge
                     }
                     var rcon = new RCON(IPAddress.Parse(settings.getFactorioIPAddress()), (ushort)settings.getFactorioPort(), settings.getFactorioRconPass());
                     BridgeConsoleWriteLine("Factorio server loaded!");
-
                     BridgeConsoleWriteLine("Starting Minecraft server...");
                     Process MinecraftServer = new Process();
                     /*
@@ -345,7 +342,6 @@ namespace Factorio_MC_Bridge
                         }
                     );
                     MinecraftServer.Start();
-                    //MinecraftServer.EnableRaisingEvents = true;
                     StreamWriter MinecraftInputWriter = MinecraftServer.StandardInput;
                     MinecraftServer.BeginOutputReadLine();
                     MinecraftServer.BeginErrorReadLine();
@@ -361,22 +357,43 @@ namespace Factorio_MC_Bridge
                     var rcon2 = new RCON(IPAddress.Parse(settings.getMcIPAddress()), (ushort)settings.getMcPort(), settings.getMcRconPass());
                     BridgeConsoleWriteLine("Minecraft server loaded!");
                     BridgeConsoleWriteLine("Beginning transfer.");
+
+                    String BridgeInput = "";
+                    System.Threading.Tasks.Task.Run
+                    (async () =>
+                        {
+                            while (true)
+                            {
+                                if (Console.IsInputRedirected == false)
+                                {
+                                    //BridgeInput = await Console.In.ReadLineAsync();
+                                    BridgeInput = await Console.In.ReadLineAsync();
+                                    //BridgeInput = Console.ReadLine();
+                                }
+                            }
+                        }
+                    );
                     while (true)
                     {
                         try
                         {
+                            if (String.IsNullOrEmpty(BridgeInput) == false)
+                            {
+                                BridgeConsoleWriteLine(BridgeInput);
+                                BridgeInput = "";
+                            }
                             List<ItemPair> factorioItems = parseFactorio(settings, itemMappings, factorioRatios);
                             List<ItemPair> minecraftItems = parseVanillaMinecraft(settings, itemMappings, minecraftRatios, rcon2).Result;
                             sendToFactorioRCON(minecraftItems, rcon);
                             //sendToFactorioExperimentalIO(minecraftItems, FactorioInputWriter);
                             sendToVanillaExperimentalIO(factorioItems, settings, MinecraftInputWriter);
+                            //sendToFactorioExperimentalIO(minecraftItems, FactorioServer.StandardInput);
+                            //sendToVanillaExperimentalIO(factorioItems, settings, MinecraftServer.StandardInput);
                             Thread.Sleep(1000);
                         }
                         catch (Exception e)
                         {
-                            BridgeConsoleWriteLine(e.InnerException.ToString());
-                            BridgeConsoleWriteLine("Something went wrong. Moving past error.");
-                            BridgeConsoleWriteLine(e.Message);
+                            PrintErrorInfo(e);
                             continue;
                         }
                     }
@@ -398,9 +415,7 @@ namespace Factorio_MC_Bridge
                         }
                         catch (Exception e)
                         {
-                            BridgeConsoleWriteLine(e.InnerException.ToString());
-                            BridgeConsoleWriteLine("Something went wrong. Moving past error.");
-                            BridgeConsoleWriteLine(e.Message);
+                            PrintErrorInfo(e);
                             continue;
                         }
                     }
@@ -408,17 +423,33 @@ namespace Factorio_MC_Bridge
             }
 		}
 
-        public static void KillPreviousServer(int ProcessID)
+        //public static void MonitorInput()
+        //{
+        //    while (BridgeInput != null)
+        //    {
+        //        BridgeConsoleWriteLine(BridgeInput);
+        //    }
+        //}
+
+        public static void KillPreviousServer(int ProcessID, String ServerType)
         {
             try
             {
                 Process Server_Process = Process.GetProcessById(ProcessID);
                 Server_Process.Kill();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-
+                BridgeConsoleWriteLine(ServerType+ " server process not running!");
             }
+        }
+
+        public static void PrintErrorInfo(Exception e)
+        {
+            BridgeConsoleWriteLine("Something went wrong. Moving past error.");
+            BridgeConsoleWriteLine("Error info:");
+            BridgeConsoleWriteLine(e.Message);
+            BridgeConsoleWriteLine(e.InnerException.ToString());
         }
 
         /// FACTORIO
@@ -456,12 +487,14 @@ namespace Factorio_MC_Bridge
 
         public static void sendToFactorioExperimentalIO(List<ItemPair> items, StreamWriter FactorioInput)
         {
+            //FactorioInput.WriteLine("/evolution");
             if (items.Count > 0)
             {
+                //Console.SetIn(Console.In);
                 for (int i = 0; i < items.Count; i++)
                 {
                     StringBuilder str = new StringBuilder();
-                    //String cmd = "";
+                    String cmd = "";
                     if (items[i].count > 100)
                     {
                         while (items[i].count > 100)
@@ -472,7 +505,9 @@ namespace Factorio_MC_Bridge
                             str.Append(@""",");
                             str.Append(100);
                             str.Append(")");
-                            FactorioInput.WriteLine(str.ToString());
+                            cmd = str.ToString();
+                            //FactorioInput.
+                            FactorioInput.WriteLine(cmd);
                             //cmd = await rcon.SendCommandAsync(str.ToString());
                             items[i].count -= 100;
                             str.Clear();
@@ -484,10 +519,12 @@ namespace Factorio_MC_Bridge
                     str.Append(@""",");
                     str.Append(items[i].count.ToString());
                     str.Append(")");
-                    FactorioInput.WriteLine(str.ToString());
+                    cmd = str.ToString();
+                    FactorioInput.WriteLine(cmd);
                     //cmd = await rcon.SendCommandAsync(str.ToString());
                     str.Clear();
                 }
+                //Console.SetIn(System.IO.TextReader.Null);
             }
         }
 
@@ -628,9 +665,7 @@ namespace Factorio_MC_Bridge
                 }
                 catch (Exception e)
                 {
-                    BridgeConsoleWriteLine(e.InnerException.ToString());
-                    BridgeConsoleWriteLine("Something went wrong. Moving past error.");
-                    BridgeConsoleWriteLine(e.Message);
+                    PrintErrorInfo(e);
                     continue;
                 }
             }
@@ -716,9 +751,7 @@ namespace Factorio_MC_Bridge
                 }
 				catch (Exception e)
                 {
-                    BridgeConsoleWriteLine(e.InnerException.ToString());
-                    BridgeConsoleWriteLine("Something went wrong. Moving past error.");
-                    BridgeConsoleWriteLine(e.Message);
+                    PrintErrorInfo(e);
                     continue;
                 }
 			}
@@ -870,6 +903,7 @@ namespace Factorio_MC_Bridge
             {
                 String[] StringsToSend = sendToVanillaMinecraft(items, settings, 27);
                 String Command = "";
+                //Console.SetIn()
                 for (int i = 0; i < StringsToSend.Length; i++)
                 {
                     Command = "execute as @e[tag=ReceiveChest,tag=!ReceiveFull,limit=1,sort=arbitrary,nbt={ArmorItems:[{tag:{CollectItems:0}}]}] store result entity @s ArmorItems[3].tag.CollectItems int 1 at @s run setblock ~ 0 ~ minecraft:shulker_box{Items:" + StringsToSend[i] + "}";
