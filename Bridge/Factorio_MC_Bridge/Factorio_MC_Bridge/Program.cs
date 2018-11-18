@@ -282,7 +282,7 @@ namespace Factorio_MC_Bridge
                         (sender, args2) =>
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("[Factorio Server] "+args2.Data);
+                            Console.WriteLine("[Factorio] "+args2.Data);
                             FactorioServerLog = args2.Data;
                         }
                     );
@@ -291,7 +291,7 @@ namespace Factorio_MC_Bridge
                         (sender, args2) =>
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("[Factorio Server] "+args2.Data);
+                            Console.WriteLine("[Factorio Error] "+args2.Data);
                             FactorioServerLog = args2.Data;
                         }
                     );
@@ -331,7 +331,7 @@ namespace Factorio_MC_Bridge
                         (sender, args2) =>
                         {
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("[Minecraft Server] "+args2.Data);
+                            Console.WriteLine("[Minecraft] "+args2.Data);
                             MinecraftServerLog = args2.Data;
                         }
                     );
@@ -340,7 +340,7 @@ namespace Factorio_MC_Bridge
                         (sender, args2) =>
                         {
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("[Minecraft Server] "+args2.Data);
+                            Console.WriteLine("[Minecraft Error] "+args2.Data);
                             MinecraftServerLog = args2.Data;
                         }
                     );
@@ -367,7 +367,8 @@ namespace Factorio_MC_Bridge
                         {
                             List<ItemPair> factorioItems = parseFactorio(settings, itemMappings, factorioRatios);
                             List<ItemPair> minecraftItems = parseVanillaMinecraft(settings, itemMappings, minecraftRatios, rcon2).Result;
-                            sendToFactorioExperimentalIO(minecraftItems, FactorioInputWriter);
+                            sendToFactorioRCON(minecraftItems, rcon);
+                            //sendToFactorioExperimentalIO(minecraftItems, FactorioInputWriter);
                             sendToVanillaExperimentalIO(factorioItems, settings, MinecraftInputWriter);
                             Thread.Sleep(1000);
                         }
